@@ -1,7 +1,7 @@
 # b130n
 Kombajn do pracy biurowej
 
-b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego oraz kalkulator walut.
+b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, planer podróży, generator kodów QR oraz czytnik RSS.
 
 ## Funkcje
 
@@ -25,13 +25,25 @@ Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, 
 
 Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.
 
+### Kody QR
+
+Generowanie kodów QR.
+
+### Planer podróży
+
+Planowanie podróży.
+
+### Czytnik RSS
+
+Informacje z Polsat NEWS.
+
 ## Technologie
 
 Aplikacja Multi-Toolbox została zbudowana przy użyciu następujących technologii:
 
 - Python
 - Tkinter (do interfejsu graficznego)
-- Biblioteki do obsługi funkcji kalkulatora diet, generatora haseł, generatora PESEL, transliteracji z rosyjskiego i kalkulatora walut.
+- Biblioteki do obsługi funkcji.
 
 ## Jak Uruchomić
 
