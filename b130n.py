@@ -86,9 +86,19 @@ class MenuApp(tk.Tk):
                                  command=self.open_generator_hasel, width=15, height=5)
         self.button5.grid(row=1, column=1, padx=2, pady=2)
 
-        self.button6 = tk.Button(
-            self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
+        self.button6 = tk.Button(self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
         self.button6.grid(row=1, column=2, padx=2, pady=2)
+        
+        self.button7 = tk.Button(self, text="KODY QR",
+                                 command=self.open_kodyqr, width=15, height=5)
+        self.button7.grid(row=2, column=0, padx=2, pady=2)
+
+        self.button8 = tk.Button(self, text="PLANER PODRÓŻY",
+                                 command=self.open_planer, width=15, height=5)
+        self.button8.grid(row=2, column=1, padx=2, pady=2)
+
+        self.button9 = tk.Button(self, text="CZYTNIK RSS", command=self.open_czytnik, width=15, height=5)
+        self.button9.grid(row=2, column=2, padx=2, pady=2)
 
         self.current_app = None
 
@@ -139,6 +149,30 @@ class MenuApp(tk.Tk):
         app6 = Transliteracja(self)
         app6.grid()
         self.current_app = app6
+        
+    def open_kodyqr(self):
+        self.hide_menu()
+        if self.current_app:
+            self.current_app.destroy()
+        app7 = KodyQR(self)
+        app7.grid()
+        self.current_app = app7
+        
+    def open_planer(self):
+        self.hide_menu()
+        if self.current_app:
+            self.current_app.destroy()
+        app8 = Planer(self)
+        app8.grid()
+        self.current_app = app8
+        
+    def open_czytnik(self):
+        self.hide_menu()
+        if self.current_app:
+            self.current_app.destroy()
+        app9 = Czytnik(self)
+        app9.grid()
+        self.current_app = app9
 
     def hide_menu(self):
         self.withdraw()
@@ -146,6 +180,14 @@ class MenuApp(tk.Tk):
     def show_menu(self):
         self.deiconify()
 
+class KodyQR(tk.Toplevel):
+    pass
+
+class Planer(tk.Toplevel):
+    pass
+
+class Czytnik(tk.Toplevel):
+    pass
 
 class DietyKrajowe(tk.Toplevel):
     def __init__(self, menu_app):
@@ -1302,9 +1344,7 @@ class PESEL(tk.Toplevel):
               "06", "07", "08", "09", "10", "11", "12"]
     days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13",
             "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28"]
-    zodiac_signs = {("01", 20): "KOZIOROŻEC", ("02", 19): "WODNIK", ("03", 21): "RYBY", ("04", 20): "BARAN", ("05", 21): "BYK",
-                    ("06", 21): "BLIŹNIĘTA", ("07", 23): "RAK", ("08", 23): "LEW", ("09", 23): "PANNA", ("10", 23): "WAGA", ("11", 22): "SKORPION", ("12", 22): "STRZELEC"}
-
+    
     def __init__(self, menu_app):
         super().__init__()
         self.menu_app = menu_app
@@ -1465,11 +1505,14 @@ class PESEL(tk.Toplevel):
                                     compound=RIGHT)
         self.copy_button01.grid(row=0, column=2, padx=5, pady=5, sticky=W)
 
-        self.Lab6 = Label(self.tab3_check)
-        self.Lab6.grid(row=4, column=0, padx=5, pady=5, columnspan=3)
+        self.wynik_frame = Frame(self.tab3_check)
+        self.wynik_frame.grid(row=4, column=0, padx=5, pady=5, columnspan=5)
 
-        self.Lab7 = Label(self.tab3_check)
-        self.Lab7.grid(row=5, column=0, padx=5, pady=5, columnspan=3)
+        self.Lab6 = Label(self.wynik_frame)
+        self.Lab6.grid(row=0, column=0, padx=5, pady=5, sticky=NS)
+
+        self.Lab7 = Label(self.wynik_frame)
+        self.Lab7.grid(row=1, column=0, padx=5, pady=5, sticky=NS)
 
     def dob_from_pesel(self):      
         lista = {0:[0,19], 1:[1,19], 2:[0,20], 3:[1,20], 4:[0,21], 5:[1,21], 6:[0,22], 7:[1,22], 8:[0,18], 9:[1,18]}
@@ -1671,11 +1714,18 @@ class PESEL(tk.Toplevel):
             self.copy_button0.config(state=ACTIVE)
 
     def zodiaq(self):
+        self.zodiac_signs = {("01", 1, 19): "KOZIOROŻEC",("12", 22, 31): "KOZIOROŻEC", ("01", 20, 31): "WODNIK", ("02", 1, 18): "WODNIK",
+                             ("02", 19, 31): "RYBY", ("03", 1, 20): "RYBY", ("03", 21, 31): "BARAN", ("04", 1, 19): "BARAN",
+                             ("04", 20, 31): "BYK", ("05", 1, 20): "BYK", ("05", 21, 31): "BLIŹNIĘTA", ("06", 1, 20): "BLIŹNIĘTA",
+                             ("06", 21, 31): "RAK", ("07", 1, 22): "RAK", ("07", 23, 31): "LEW", ("08", 1, 22): "LEW",
+                             ("08", 23, 31): "PANNA", ("09", 1, 22): "PANNA", ("09", 23, 31): "WAGA", ("10", 1, 22): "WAGA",
+                             ("10", 23, 31): "SKORPION", ("11", 1, 21): "SKORPION", ("11", 22, 31): "STRZELEC", ("12", 1, 21): "STRZELEC"}
+        
         z_month = str(self.date_of_birth[3:5])
         z_day = int(self.date_of_birth[:2])
 
-        for (month, day_limit), self.sign in self.zodiac_signs.items():
-            if z_month == month and z_day <= day_limit:
+        for (month, day_start, day_end), self.sign in self.zodiac_signs.items():
+            if z_month == month and day_start <= z_day <= day_end:
                 return self.sign
             
     def telefon(self):
@@ -2306,7 +2356,7 @@ Diety zagraniczne:
 - przemyslec kwestie wyswietlania komunikatu o niedoliczeniu zarcia lub ryczaltow
 
 PESEL:
-- poprawic wizualnie wyniki przy tworzeniu tozsamosci
+- poprawic wizualnie wyniki przy tworzeniu tozsamosci, moze niech sie to otwiera w nowym oknie w formie tabeli
 
 Kalkulator walut:
 -
@@ -2318,16 +2368,17 @@ Transliteracja:
 Generator haseł:
 -
 
-dodac planer podrozy:
+Planer podrozy:
 - czas dojazdu
 - potrzebne srodki finansowe
 - o czym trzeba pameitac w danym kraju
 
-dodac genrator qrcodow:
+Kody QR:
 - wybor miejsca zapisu pliku
 - wybor rozmiaru qr codu
 - sprawdzic jakie sa mozliwosci biblioteki
 
-dodac cos jeszcze, najlepiej jakis scraper:
+Czytnik RSS:
+- przepisac z pliku scraper
 
 """
