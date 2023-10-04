@@ -1,7 +1,7 @@
 # b130n
 Kombajn do pracy biurowej
 
-b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, planer podróży, generator kodów QR oraz czytnik RSS.
+b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, planer podróży, generator kodów QR oraz tablice rejestracyjne.
 
 ## Funkcje
 
