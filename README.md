@@ -25,21 +25,21 @@ Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, 
 
 Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.
 
-### Kody QR
+### Kody QR (W BUDOWIE)
 
 Generowanie kodów QR.
 
-### Planer podróży
+### Planer podróży (W BUDOWIE)
 
 Planowanie podróży.
 
-### Czytnik RSS
+### Tablice rejestracyjne (W BUDOWIE)
 
-Informacje z Polsat NEWS.
+Rozkodowywanie tablic rejestracyjnych w Polsce (policyjne, wojskowe, innych służb, dyplomatyczne, poszczególne powiaty).
 
 ## Technologie
 
-Aplikacja Multi-Toolbox została zbudowana przy użyciu następujących technologii:
+Aplikacja została zbudowana przy użyciu następujących technologii:
 
 - Python
 - Tkinter (do interfejsu graficznego)
@@ -52,10 +52,3 @@ Aby uruchomić aplikację b130n na swoim komputerze, wykonaj następujące kroki
 1. Sklonuj repozytorium na swój lokalny komputer.
 2. Zainstaluj wymagane biblioteki i zależności.
 3. Uruchom program za pomocą Pythona.
-
-## Współtworzenie
-
-Jeśli masz pomysły na dodatkowe funkcje lub poprawki, chętnie przyjmiemy Twoje wkłady.
-
-Dziękuję za korzystanie z b130n i mam nadzieję, że będzie ona przydatna w Twoich codziennych zadaniach!
-
