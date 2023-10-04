@@ -65,7 +65,7 @@ options = ["dolar amerykański [USD]", "dolar australijski [AUD]", "dolar kanady
 class MenuApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("B!30N")
+        self.title("B130N")
         self.button1 = tk.Button(
             self, text="DIETY\n KRAJOWE", command=self.open_diety_krajowe, width=15, height=5)
         self.button1.grid(row=0, column=0, padx=2, pady=2)
@@ -86,9 +86,10 @@ class MenuApp(tk.Tk):
                                  command=self.open_generator_hasel, width=15, height=5)
         self.button5.grid(row=1, column=1, padx=2, pady=2)
 
-        self.button6 = tk.Button(self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
+        self.button6 = tk.Button(
+            self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
         self.button6.grid(row=1, column=2, padx=2, pady=2)
-        
+
         self.button7 = tk.Button(self, text="KODY QR",
                                  command=self.open_kodyqr, width=15, height=5)
         self.button7.grid(row=2, column=0, padx=2, pady=2)
@@ -97,7 +98,8 @@ class MenuApp(tk.Tk):
                                  command=self.open_planer, width=15, height=5)
         self.button8.grid(row=2, column=1, padx=2, pady=2)
 
-        self.button9 = tk.Button(self, text="CZYTNIK RSS", command=self.open_czytnik, width=15, height=5)
+        self.button9 = tk.Button(
+            self, text="TABLICE\n REJESTRACYJNE", command=self.open_tablice, width=15, height=5)
         self.button9.grid(row=2, column=2, padx=2, pady=2)
 
         self.current_app = None
@@ -149,7 +151,7 @@ class MenuApp(tk.Tk):
         app6 = Transliteracja(self)
         app6.grid()
         self.current_app = app6
-        
+
     def open_kodyqr(self):
         self.hide_menu()
         if self.current_app:
@@ -157,7 +159,7 @@ class MenuApp(tk.Tk):
         app7 = KodyQR(self)
         app7.grid()
         self.current_app = app7
-        
+
     def open_planer(self):
         self.hide_menu()
         if self.current_app:
@@ -165,12 +167,12 @@ class MenuApp(tk.Tk):
         app8 = Planer(self)
         app8.grid()
         self.current_app = app8
-        
-    def open_czytnik(self):
+
+    def open_tablice(self):
         self.hide_menu()
         if self.current_app:
             self.current_app.destroy()
-        app9 = Czytnik(self)
+        app9 = Tablice(self)
         app9.grid()
         self.current_app = app9
 
@@ -180,14 +182,18 @@ class MenuApp(tk.Tk):
     def show_menu(self):
         self.deiconify()
 
+
 class KodyQR(tk.Toplevel):
     pass
+
 
 class Planer(tk.Toplevel):
     pass
 
-class Czytnik(tk.Toplevel):
+
+class Tablice(tk.Toplevel):
     pass
+
 
 class DietyKrajowe(tk.Toplevel):
     def __init__(self, menu_app):
@@ -296,13 +302,14 @@ class DietyKrajowe(tk.Toplevel):
 
         self.var1dk = tk.IntVar()
         self.check_sniadaniedk = tk.Checkbutton(self.page3, text="ŚNIADANIE", onvalue=1,
-                                             offvalue=0, command=self.checking_sniadaniedk, variable=self.var1dk)
+                                                offvalue=0, command=self.checking_sniadaniedk, variable=self.var1dk)
         self.check_sniadaniedk.grid(
             row=1, column=0, padx=50, pady=5, sticky="W", columnspan=2)
         self.label_sniadanie = tk.Label(self.page3, text="w ilości")
         self.label_sniadanie.grid(row=1, column=2, sticky="E", padx=5, pady=5)
         self.ilosc_sniadaniedk = tk.Entry(self.page3, width=5, state=DISABLED)
-        self.ilosc_sniadaniedk.grid(row=1, column=3, sticky="W", padx=5, pady=5)
+        self.ilosc_sniadaniedk.grid(
+            row=1, column=3, sticky="W", padx=5, pady=5)
 
         self.var2dk = IntVar()
         self.check_obiaddk = Checkbutton(self.page3, text="OBIAD", onvalue=1,
@@ -507,7 +514,7 @@ class DietyKrajowe(tk.Toplevel):
     def licz_diete(self):
         try:
             s_rok = int(self.cal_start.get_date()[-4:])
-            s_miesiac = int(self.cal_start.get_date()[4:5])
+            s_miesiac = int(self.cal_start.get_date()[3:5])
             s_dzien = int(self.cal_start.get_date()[:2])
             s_godzina = int(self.wybor_godziny_startu.get())
             s_minuta = int(self.wybor_minuty_startu.get())
@@ -517,7 +524,7 @@ class DietyKrajowe(tk.Toplevel):
 
         try:
             k_rok = int(self.cal_koniec.get_date()[-4:])
-            k_miesiac = int(self.cal_koniec.get_date()[4:5])
+            k_miesiac = int(self.cal_koniec.get_date()[3:5])
             k_dzien = int(self.cal_koniec.get_date()[:2])
             k_godzina = int(self.wybor_godziny_konca.get())
             k_minuta = int(self.wybor_minuty_konca.get())
@@ -576,7 +583,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} PLN.")
         else:
             self.ryczalt_nocleg = 0
-            ryc_noc_info = (f"Nie uwzględniono ryczałtu za nocleg.")
+            ryc_noc_info = ("")
 
         if self.auto_var2.get():
             self.ryczalt_auto
@@ -584,8 +591,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} PLN.")
         else:
             self.ryczalt_auto = 0
-            ryc_auto_info = (
-                f"Nie uwzględniono ryczałtu za pozdróż prywatnym środkiem transportu.")
+            ryc_auto_info = ("")
 
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
@@ -593,8 +599,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} PLN.")
         else:
             self.ryczalt_komunikacja = 0
-            ryc_kom_info = (
-                f"Nie uwzględniono ryczałtu za przejazd środkami komunikacji miejscowej.")
+            ryc_kom_info = ("")
 
         zarcie = sniadanie + obiad + kolacja
 
@@ -602,8 +607,7 @@ class DietyKrajowe(tk.Toplevel):
             zarcie_info = (
                 f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.")
         else:
-            zarcie_info = (
-                f"Podczas delegacji nie zapewniono zadnych posiłków.")
+            zarcie_info = ("")
 
         nalezna_dieta = nalezna_dieta_dzien + \
             nalezna_dieta_godz - sniadanie - obiad - kolacja + \
@@ -628,14 +632,23 @@ class DietyKrajowe(tk.Toplevel):
         else:
             wersja_minut = "minut"
 
-        result = (f"""
-            Delegacja krajowa trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
-            {zarcie_info}\n
-            {ryc_noc_info}
-            {ryc_kom_info}
-            {ryc_auto_info}\n
-            Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
-            """)
+        dodatki = zarcie + self.komunikacja_var3.get() + self.auto_var2.get() + \
+            self.nocleg_var1.get()
+
+        if dodatki != 0:
+            result = (f"""
+                Delegacja krajowa trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
+                {zarcie_info}
+                {ryc_noc_info}
+                {ryc_kom_info}
+                {ryc_auto_info}
+                Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
+                """)
+        else:
+            result = (f"""
+                Delegacja krajowa trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
+                Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
+                """)
 
         self.label_wynik.config(text=result)
 
@@ -961,12 +974,12 @@ class DietyZagraniczne(tk.Toplevel):
             igrek = diet_zagranica[zet]
             hotel = igrek[2]
             s_rok = int(self.zcal_start.get_date()[-4:])
-            s_miesiac = int(self.zcal_start.get_date()[4:5])
+            s_miesiac = int(self.zcal_start.get_date()[3:5])
             s_dzien = int(self.zcal_start.get_date()[:2])
             s_godzina = int(self.zwybor_godziny_startu.get())
             s_minuta = int(self.zwybor_minuty_startu.get())
             k_rok = int(self.zcal_koniec.get_date()[-4:])
-            k_miesiac = int(self.zcal_koniec.get_date()[4:5])
+            k_miesiac = int(self.zcal_koniec.get_date()[3:5])
             k_dzien = int(self.zcal_koniec.get_date()[:2])
             k_godzina = int(self.zwybor_godziny_konca.get())
             k_minuta = int(self.zwybor_minuty_konca.get())
@@ -1037,12 +1050,12 @@ class DietyZagraniczne(tk.Toplevel):
             igrek = diet_zagranica[zet]
             dieta = igrek[1]
             s_rok = int(self.zcal_start.get_date()[-4:])
-            s_miesiac = int(self.zcal_start.get_date()[4:5])
+            s_miesiac = int(self.zcal_start.get_date()[3:5])
             s_dzien = int(self.zcal_start.get_date()[:2])
             s_godzina = int(self.zwybor_godziny_startu.get())
             s_minuta = int(self.zwybor_minuty_startu.get())
             k_rok = int(self.zcal_koniec.get_date()[-4:])
-            k_miesiac = int(self.zcal_koniec.get_date()[4:5])
+            k_miesiac = int(self.zcal_koniec.get_date()[3:5])
             k_dzien = int(self.zcal_koniec.get_date()[:2])
             k_godzina = int(self.zwybor_godziny_konca.get())
             k_minuta = int(self.zwybor_minuty_konca.get())
@@ -1076,7 +1089,7 @@ class DietyZagraniczne(tk.Toplevel):
 
         try:
             s_rok = int(self.zcal_start.get_date()[-4:])
-            s_miesiac = int(self.zcal_start.get_date()[4:5])
+            s_miesiac = int(self.zcal_start.get_date()[3:5])
             s_dzien = int(self.zcal_start.get_date()[:2])
             s_godzina = int(self.zwybor_godziny_startu.get())
             s_minuta = int(self.zwybor_minuty_startu.get())
@@ -1086,7 +1099,7 @@ class DietyZagraniczne(tk.Toplevel):
 
         try:
             k_rok = int(self.zcal_koniec.get_date()[-4:])
-            k_miesiac = int(self.zcal_koniec.get_date()[4:5])
+            k_miesiac = int(self.zcal_koniec.get_date()[3:5])
             k_dzien = int(self.zcal_koniec.get_date()[:2])
             k_godzina = int(self.zwybor_godziny_konca.get())
             k_minuta = int(self.zwybor_minuty_konca.get())
@@ -1139,7 +1152,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} PLN.")
         else:
             self.ryczalt_nocleg = 0
-            ryc_noc_info = (f"Nie uwzględniono ryczałtu za nocleg.")
+            ryc_noc_info = ("")
 
         if self.auto_var2.get():
             self.ryczalt_auto
@@ -1147,8 +1160,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} PLN.")
         else:
             self.ryczalt_auto = 0
-            ryc_auto_info = (
-                f"Nie uwzględniono ryczałtu za pozdróż prywatnym środkiem transportu.")
+            ryc_auto_info = ("")
 
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
@@ -1156,8 +1168,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} PLN.")
         else:
             self.ryczalt_komunikacja = 0
-            ryc_kom_info = (
-                f"Nie uwzględniono ryczałtu za przejazd środkami komunikacji miejscowej.")
+            ryc_kom_info = ("")
 
         if self.dojazd_do_var4.get():
             self.ryczalt_dojazd_do
@@ -1165,8 +1176,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd do lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_do,2)} PLN.")
         else:
             self.ryczalt_dojazd_do = 0
-            ryc_dojazd_do = (
-                f"Nie uwzględniono ryczałtu za dojazd do lotniska.")
+            ryc_dojazd_do = ("")
 
         if self.dojazd_z_var5.get():
             self.ryczalt_dojazd_z
@@ -1174,7 +1184,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd z lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_z,2)} PLN.")
         else:
             self.ryczalt_dojazd_z = 0
-            ryc_dojazd_z = (f"Nie uwzględniono ryczałtu za dojazd z lotniska.")
+            ryc_dojazd_z = ("")
 
         zarcie = sniadanie + obiad + kolacja
 
@@ -1182,8 +1192,7 @@ class DietyZagraniczne(tk.Toplevel):
             zarcie_info = (
                 f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.")
         else:
-            zarcie_info = (
-                f"Podczas delegacji nie zapewniono zadnych posiłków.")
+            zarcie_info = ("")
 
         nalezna_dieta = nalezna_dieta_dzien + \
             nalezna_dieta_godz - sniadanie - obiad - kolacja + \
@@ -1208,16 +1217,25 @@ class DietyZagraniczne(tk.Toplevel):
         else:
             wersja_minut = "minut"
 
-        result = (f"""
-            Delegacja {gamma} trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} {omega} + {round(nalezna_dieta_godz,2)} {omega}).\n
-            {zarcie_info}\n
-            {ryc_noc_info}
-            {ryc_kom_info}
-            {ryc_auto_info}
-            {ryc_dojazd_do}
-            {ryc_dojazd_z}\n
-            Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
-            """)
+        dodatki = zarcie + self.dojazd_z_var5.get() + self.dojazd_do_var4.get() + \
+            self.komunikacja_var3.get() + self.auto_var2.get() + self.nocleg_var1.get()
+
+        if dodatki != 0:
+            result = (f"""
+                Delegacja {gamma} trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} {omega} + {round(nalezna_dieta_godz,2)} {omega}).\n
+                {zarcie_info}
+                {ryc_noc_info}
+                {ryc_kom_info}
+                {ryc_auto_info}
+                {ryc_dojazd_do}
+                {ryc_dojazd_z}
+                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.
+                """)
+        else:
+            result = (f"""
+                Delegacja {gamma} trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} {omega} + {round(nalezna_dieta_godz,2)} {omega}).\n
+                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.
+                """)
 
         self.zlabel_wynik.config(text=result)
 
@@ -1344,7 +1362,7 @@ class PESEL(tk.Toplevel):
               "06", "07", "08", "09", "10", "11", "12"]
     days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13",
             "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28"]
-    
+
     def __init__(self, menu_app):
         super().__init__()
         self.menu_app = menu_app
@@ -1514,13 +1532,14 @@ class PESEL(tk.Toplevel):
         self.Lab7 = Label(self.wynik_frame)
         self.Lab7.grid(row=1, column=0, padx=5, pady=5, sticky=NS)
 
-    def dob_from_pesel(self):      
-        lista = {0:[0,19], 1:[1,19], 2:[0,20], 3:[1,20], 4:[0,21], 5:[1,21], 6:[0,22], 7:[1,22], 8:[0,18], 9:[1,18]}
-        
+    def dob_from_pesel(self):
+        lista = {0: [0, 19], 1: [1, 19], 2: [0, 20], 3: [1, 20], 4: [
+            0, 21], 5: [1, 21], 6: [0, 22], 7: [1, 22], 8: [0, 18], 9: [1, 18]}
+
         dzien = self.Enter1.get()[4:6]
         miesiac = f"""{lista[int(self.Enter1.get()[2])][0]}{self.Enter1.get()[3]}"""
         rok = f"""{lista[int(self.Enter1.get()[2])][1]}{self.Enter1.get()[0:2]}"""
-        
+
         self.dob_confirm = f"""Data urodzenia to {dzien}-{miesiac}-{rok}"""
         return self.dob_confirm
 
@@ -1714,28 +1733,31 @@ class PESEL(tk.Toplevel):
             self.copy_button0.config(state=ACTIVE)
 
     def zodiaq(self):
-        self.zodiac_signs = {("01", 1, 19): "KOZIOROŻEC",("12", 22, 31): "KOZIOROŻEC", ("01", 20, 31): "WODNIK", ("02", 1, 18): "WODNIK",
+        self.zodiac_signs = {("01", 1, 19): "KOZIOROŻEC", ("12", 22, 31): "KOZIOROŻEC", ("01", 20, 31): "WODNIK", ("02", 1, 18): "WODNIK",
                              ("02", 19, 31): "RYBY", ("03", 1, 20): "RYBY", ("03", 21, 31): "BARAN", ("04", 1, 19): "BARAN",
                              ("04", 20, 31): "BYK", ("05", 1, 20): "BYK", ("05", 21, 31): "BLIŹNIĘTA", ("06", 1, 20): "BLIŹNIĘTA",
                              ("06", 21, 31): "RAK", ("07", 1, 22): "RAK", ("07", 23, 31): "LEW", ("08", 1, 22): "LEW",
                              ("08", 23, 31): "PANNA", ("09", 1, 22): "PANNA", ("09", 23, 31): "WAGA", ("10", 1, 22): "WAGA",
                              ("10", 23, 31): "SKORPION", ("11", 1, 21): "SKORPION", ("11", 22, 31): "STRZELEC", ("12", 1, 21): "STRZELEC"}
-        
+
         z_month = str(self.date_of_birth[3:5])
         z_day = int(self.date_of_birth[:2])
 
         for (month, day_start, day_end), self.sign in self.zodiac_signs.items():
             if z_month == month and day_start <= z_day <= day_end:
                 return self.sign
-            
+
     def telefon(self):
         start_numeru = [45, 50, 51, 53, 57, 60, 66, 69, 72, 73, 78, 79, 88]
-        self.numer_telefonu = (f"""+48 {random.choice(start_numeru)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)}""")
+        self.numer_telefonu = (
+            f"""+48 {random.choice(start_numeru)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)}""")
         return self.numer_telefonu
-    
+
     def mail(self):
-        skrzynka = ["gmail.com", "wp.pl", "o2.pl", "onet.eu", "onet.pl", "interia.pl", "gazeta.pl", "proton.me"]
-        zamiana_liter = {"ą": "a", "ć":"c", "ę":"e", "ł":"l", "ń":"n","ó":"o", "ś":"s", "ź":"z", "ż":"z"}
+        skrzynka = ["gmail.com", "wp.pl", "o2.pl", "onet.eu",
+                    "onet.pl", "interia.pl", "gazeta.pl", "proton.me"]
+        zamiana_liter = {"ą": "a", "ć": "c", "ę": "e", "ł": "l",
+                         "ń": "n", "ó": "o", "ś": "s", "ź": "z", "ż": "z"}
         self.name_new = []
         self.last_name_new = []
 
@@ -1743,20 +1765,25 @@ class PESEL(tk.Toplevel):
             translated_char = zamiana_liter.get(char, char)
             self.name_new.append(translated_char)
             self.result_name = ''.join(self.name_new)
-        
+
         for char in self.last_name.lower():
             translated_char = zamiana_liter.get(char, char)
             self.last_name_new.append(translated_char)
             self.result_last_name = ''.join(self.last_name_new)
-            
+
         znak = [".", "-", "_"]
-        opt1 = (f"""{self.result_name}{random.choice(znak)}{self.result_last_name}""")
-        opt2 = (f"""{self.result_last_name}{random.choice(znak)}{self.result_name}""")
-        opt3 = (f"""{self.result_name}{random.choice(znak)}{self.result_last_name}{random.randint(0, 9)}{random.randint(0, 9)}""")
-        opt4 = (f"""{self.result_last_name}{random.choice(znak)}{self.result_name}{random.randint(0, 9)}{random.randint(0, 9)}""")
+        opt1 = (
+            f"""{self.result_name}{random.choice(znak)}{self.result_last_name}""")
+        opt2 = (
+            f"""{self.result_last_name}{random.choice(znak)}{self.result_name}""")
+        opt3 = (
+            f"""{self.result_name}{random.choice(znak)}{self.result_last_name}{random.randint(0, 9)}{random.randint(0, 9)}""")
+        opt4 = (
+            f"""{self.result_last_name}{random.choice(znak)}{self.result_name}{random.randint(0, 9)}{random.randint(0, 9)}""")
         opcje = [opt1, opt2, opt3, opt4]
-        
-        self.adres_email = (f"""{random.choice(opcje)}@{random.choice(skrzynka)}""")
+
+        self.adres_email = (
+            f"""{random.choice(opcje)}@{random.choice(skrzynka)}""")
         return self.adres_email
 
     def generate_identity(self):
@@ -1768,6 +1795,10 @@ class PESEL(tk.Toplevel):
                 break
             if not self.EE.get():
                 generated_personality = "Wprowadź wiek!"
+                self.Lab6.config(text=generated_personality)
+                break
+            if int(self.EE.get()) >= 100:
+                generated_personality = "Bez przesady, zejdź poniżej 100 lat..."
                 self.Lab6.config(text=generated_personality)
                 break
             if not self.EE.get().isdigit():
@@ -2309,21 +2340,20 @@ class Transliteracja(tk.Toplevel):
         self.output_text.pack(padx=5, pady=5)
 
     def translate(self):
-        self.all_chars = {"Й": "Y", "Ц": "TS", "У": "U", "К": "K", "Е": "E", "Н": "N", "Г": "G", "Ш": "SH", "Ё": "E",
-                          "Щ": "SHCH", "З": "Z", "Х": "H", "Ъ": "", "Ф": "F", "Ы": "Y", "В": "V", "А": "A",
-                          "П": "P", "Р": "R", "О": "O", "Л": "L", "Д": "D", "Ж": "ZH", "Э": "E", "Я": "YA",
-                          "Ч": "CH", "С": "S", "М": "M", "И": "I", "Т": "T", "Ь": "", "Б": "B", "Ю": "YU",
-                          "й": "y",  "ц": "ts",  "у": "u",  "к": "k",  "е": "e",  "н": "n",  "г": "g",
-                          "ш": "sh",  "щ": "shch",  "з": "z",  "х": "h",  "ъ": "",  "ф": "f",  "ы": "y",
-                          "в": "v",  "а": "a",  "п": "p", "р": "r",  "о": "o",  "л": "l",  "д": "d", "ё": "e",
-                          "ж": "zh",  "э": "e",  "я": "ya",  "ч": "ch",  "с": "s",  "м": "m",  "и": "i",
-                          "т": "t",  "ь": "",  "б": "b",  "ю": "yu", " ": " "}
-
+        self.all_chars_rus = {"Й": "Y", "Ц": "TS", "У": "U", "К": "K", "Е": "E", "Н": "N", "Г": "G", "Ш": "SH", "Ё": "E",
+                              "Щ": "SHCH", "З": "Z", "Х": "H", "Ъ": "", "Ф": "F", "Ы": "Y", "В": "V", "А": "A",
+                              "П": "P", "Р": "R", "О": "O", "Л": "L", "Д": "D", "Ж": "ZH", "Э": "E", "Я": "YA",
+                              "Ч": "CH", "С": "S", "М": "M", "И": "I", "Т": "T", "Ь": "", "Б": "B", "Ю": "YU",
+                              "й": "y",  "ц": "ts",  "у": "u",  "к": "k",  "е": "e",  "н": "n",  "г": "g",
+                              "ш": "sh",  "щ": "shch",  "з": "z",  "х": "h",  "ъ": "",  "ф": "f",  "ы": "y",
+                              "в": "v",  "а": "a",  "п": "p", "р": "r",  "о": "o",  "л": "l",  "д": "d", "ё": "e",
+                              "ж": "zh",  "э": "e",  "я": "ya",  "ч": "ch",  "с": "s",  "м": "m",  "и": "i",
+                              "т": "t",  "ь": "",  "б": "b",  "ю": "yu", " ": " "}
         text_to_translate = self.input_text.get("1.0", "end-1c")
         self.lista = []
 
         for char in text_to_translate:
-            translated_char = self.all_chars.get(char, char)
+            translated_char = self.all_chars_rus.get(char, char)
             self.lista.append(translated_char)
 
         self.output_text.delete("1.0", "end")
@@ -2350,10 +2380,10 @@ if __name__ == "__main__":
 
 """
 Diety krajowe:
-- przemyslec kwestie wyswietlania komunikatu o niedoliczeniu zarcia lub ryczaltow
+-
 
 Diety zagraniczne:
-- przemyslec kwestie wyswietlania komunikatu o niedoliczeniu zarcia lub ryczaltow
+-
 
 PESEL:
 - poprawic wizualnie wyniki przy tworzeniu tozsamosci, moze niech sie to otwiera w nowym oknie w formie tabeli
@@ -2362,9 +2392,9 @@ Kalkulator walut:
 -
 
 Transliteracja:
-- klawiatura ekranowa z rosyjska klawiatura
+- niech z normalnych liter robi cyrylice
 - ogarnac to wizualnie
-
+ 
 Generator haseł:
 -
 
@@ -2378,7 +2408,6 @@ Kody QR:
 - wybor rozmiaru qr codu
 - sprawdzic jakie sa mozliwosci biblioteki
 
-Czytnik RSS:
-- przepisac z pliku scraper
+Bedzie jednak tablice rejestracyjne!!! zwykle, dyplomatyczne, nieoznakowane radiowozy
 
 """
