@@ -13,6 +13,10 @@ import json
 import secrets
 import string
 import time
+import qrcode
+from tkinter import filedialog
+import os
+
 
 godziny = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
@@ -184,8 +188,144 @@ class MenuApp(tk.Tk):
 
 
 class KodyQR(tk.Toplevel):
-    pass
+    def __init__(self, menu_app):
+        super().__init__()
+        self.menu_app = menu_app
+        self.title("GENERATOR KODÓW QR")
+        self.protocol("WM_DELETE_WINDOW", self.on_close_window)
+        self.current_page = None
+        self.strona_pierwsza()
 
+        self.show_page(self.page1)
+
+    def strona_pierwsza(self):
+        self.page1 = tk.Frame(self)
+        self.data_label = Label(self.page1, text="Wprowadź dane do wygenerowania kodu QR:")
+        self.data_label.pack()
+
+        self.data_entry = Entry(self.page1, width=40)
+        self.data_entry.pack()
+
+        self.version_label = Label(self.page1, text="Wybierz wersję kodu QR (1-40):")
+        self.version_label.pack()
+
+        self.version_var = StringVar()
+        self.version_var.set("1")
+        self.version_option_menu = OptionMenu(self.page1, self.version_var, *map(str, range(1, 41)))
+        self.version_option_menu.pack()
+
+        self.error_correction_label = Label(self.page1, text="Wybierz poziom korekcji błędów:")
+        self.error_correction_label.pack()
+
+        self.error_correction_var = StringVar()
+        self.error_correction_var.set("H")
+        self.error_correction_option_menu = OptionMenu(self.page1, self.error_correction_var, "L", "M", "Q", "H")
+        self.error_correction_option_menu.pack()
+
+        self.box_size_label = Label(self.page1, text="Wybierz rozmiar box (1-10):")
+        self.box_size_label.pack()
+
+        self.box_size_var = StringVar()
+        self.box_size_var.set("5")
+        self.box_size_option_menu = OptionMenu(self.page1, self.box_size_var, *map(str, range(1, 11)))
+        self.box_size_option_menu.pack()
+
+        self.border_label = Label(self.page1, text="Wybierz border (0-10):")
+        self.border_label.pack()
+
+        self.border_var = StringVar()
+        self.border_var.set("2")
+        self.border_option_menu = OptionMenu(self.page1, self.border_var, *map(str, range(11)))
+        self.border_option_menu.pack()
+
+        self.browse_button = Button(self.page1, text="Przeglądaj", command=self.browse_folder)
+        self.browse_button.pack()
+
+        self.generate_button = Button(self.page1, text="Generuj QR", command=self.generate_qr, state=DISABLED)
+        self.generate_button.pack()
+
+        self.result_label = Label(self.page1)
+        self.result_label.pack()
+
+    def generate_unique_filename(self, folder, base_filename):
+        unique_filename = base_filename
+        counter = 1
+        while os.path.exists(os.path.join(folder, unique_filename)):
+            unique_filename = f"{base_filename}_{counter}"
+            counter += 1
+        return os.path.join(folder, unique_filename)
+
+
+    def qr_generate(self, data, version, error_correction, box_size, border, save_folder):
+        filename = "qr_code.jpg"
+        save_path = os.path.join(save_folder, filename)
+        error_correction_mapping = {"L": qrcode.constants.ERROR_CORRECT_L,
+                                "M": qrcode.constants.ERROR_CORRECT_M,
+                                "Q": qrcode.constants.ERROR_CORRECT_Q,
+                                "H": qrcode.constants.ERROR_CORRECT_H}
+
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+
+        if os.path.exists(save_path):
+            save_path = self.generate_unique_filename(save_folder, "qr_code.jpg")
+
+        qr = qrcode.QRCode(
+            version=version,
+            error_correction=error_correction_mapping[error_correction],
+            box_size=box_size,
+            border=border)
+        
+        qr.add_data(data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color='black', back_color='white')
+        img.save(save_path)
+        info = f"Kod QR wygenerowano do pliku {save_path}"
+        messagebox.showinfo('Śliwka Coding Center ©', info)
+
+
+    def browse_folder(self):
+        global folder_path
+        folder_path = filedialog.askdirectory()
+        self.generate_button.config(state=ACTIVE)
+
+
+    def generate_qr(self):
+        data = self.data_entry.get()
+        version = int(self.version_var.get())
+        error_correction = self.error_correction_var.get()
+        box_size = int(self.box_size_var.get())
+        border = int(self.border_var.get())
+
+        if data:
+            if version > 0 and version <= 40:
+                if box_size >= 1 and box_size <= 10:
+                    if border >= 0 and border <= 10:
+                        self.qr_generate(data, version, error_correction,
+                                    box_size, border, folder_path)
+                    else:
+                        self.result_label.config(
+                            text="Wprowadź poprawny border (od 0 do 10).")
+                else:
+                    self.result_label.config(
+                        text="Wprowadź poprawny box size (od 1 do 10).")
+            else:
+                self.result_label.config(text="Wprowadź poprawną wersję (od 1 do 40).")
+        else:
+            self.result_label.config(text="Wprowadź dane do wygenerowania kodu QR.")
+        
+    def show_page(self, page):
+        if self.current_page:
+            self.current_page.grid_forget()
+        page.grid(row=0, column=0, sticky="nsew")
+        self.current_page = page
+        
+    def on_close_window(self):
+        self.back_to_menu()
+
+    def back_to_menu(self):
+        self.menu_app.show_menu()
+        self.destroy()
 
 class Planer(tk.Toplevel):
     pass
@@ -1527,7 +1667,7 @@ class PESEL(tk.Toplevel):
         self.wynik_frame.grid(row=4, column=0, padx=5, pady=5, columnspan=5)
 
         self.Lab6 = Label(self.wynik_frame)
-        self.Lab6.grid(row=0, column=0, padx=5, pady=5, sticky=NS)
+        self.Lab6.grid(row=0, column=0, padx=5, pady=5, sticky=W)
 
         self.Lab7 = Label(self.wynik_frame)
         self.Lab7.grid(row=1, column=0, padx=5, pady=5, sticky=NS)
@@ -1947,7 +2087,7 @@ class PESEL(tk.Toplevel):
                 self.Lab6.config(text=self.generated_identity)
                 self.copy_button01.config(state=ACTIVE)
                 break
-
+                    
     def show_page(self, page):
         if self.current_page:
             self.current_page.grid_forget()
@@ -1959,8 +2099,7 @@ class PESEL(tk.Toplevel):
 
     def back_to_menu(self):
         self.menu_app.show_menu()
-        self.destroy()
-
+        self.destroy()            
 
 class KalkulatorWalut(tk.Toplevel):
     def __init__(self, menu_app):
@@ -2307,7 +2446,6 @@ class GeneratorHasel(tk.Toplevel):
         self.menu_app.show_menu()
         self.destroy()
 
-
 class Transliteracja(tk.Toplevel):
     def __init__(self, menu_app):
         super().__init__()
@@ -2333,7 +2471,7 @@ class Transliteracja(tk.Toplevel):
             self.page1, text="Transliteruj", command=self.translate)
         self.translate_button.pack(padx=5, pady=5)
 
-        self.output_label = tk.Label(self.page1, text="Wynik")
+        self.output_label = tk.Label(self.page1, text="Rezultat transliteracji")
         self.output_label.pack(padx=5, pady=5)
 
         self.output_text = tk.Text(self.page1, height=4)
@@ -2386,14 +2524,13 @@ Diety zagraniczne:
 -
 
 PESEL:
-- poprawic wizualnie wyniki przy tworzeniu tozsamosci, moze niech sie to otwiera w nowym oknie w formie tabeli
+- niewlasciwa suma kontrolna wygenerowanego peselu przy tworzeniu tozsamosci
 
 Kalkulator walut:
 -
 
 Transliteracja:
-- niech z normalnych liter robi cyrylice
-- ogarnac to wizualnie
+- 
  
 Generator haseł:
 -
@@ -2404,10 +2541,16 @@ Planer podrozy:
 - o czym trzeba pameitac w danym kraju
 
 Kody QR:
-- wybor miejsca zapisu pliku
-- wybor rozmiaru qr codu
-- sprawdzic jakie sa mozliwosci biblioteki
+- opis dokladnie opcje wyboru
+- zmienic napis przy pomyslnym wygenerowaniu kodu
+- https://informatykzakladowy.pl/wiecej-niz-chcieliscie-wiedziec-o-qr-kodach/
+- dodac przycisk powrotu do menu
+- zmienic pack na grid
 
-Bedzie jednak tablice rejestracyjne!!! zwykle, dyplomatyczne, nieoznakowane radiowozy
+
+Tablice rejestracyjne:
+- zwykle, 
+- dyplomatyczne, 
+- nieoznakowane radiowozy
 
 """
