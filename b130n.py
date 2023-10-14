@@ -1771,105 +1771,69 @@ class PESEL(tk.Toplevel):
             self.L4.config(text=info)
         if self.man.get() == 1:
             num_list = [1, 3, 5, 7, 9]
-            while True:
-                position_1 = self.kalendarz.get_date()[8]
-                position_2 = self.kalendarz.get_date()[9]
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "8" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 8
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "8" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 9
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "0" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 2
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "0" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 3
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "1" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 4
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "1" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 5
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "2" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 6
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "2" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 7
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "9" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = self.kalendarz.get_date()[3]
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "9" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = self.kalendarz.get_date()[3]
-                position_4 = self.kalendarz.get_date()[4]
-                position_5 = self.kalendarz.get_date()[0]
-                position_6 = self.kalendarz.get_date()[1]
-                position_7 = random.randint(0, 9)
-                position_8 = random.randint(0, 9)
-                position_9 = str(random.randint(0, 9))
-                position_10 = random.choice(num_list)
-                p_2 = str(position_2 * 3)
-                p_3 = str(position_3 * 7)
-                p_4 = str(position_4 * 9)
-                p_6 = str(position_6 * 3)
-                p_7 = str(position_7 * 7)
-                p_8 = str(position_8 * 9)
-                p_10 = str(position_10 * 3)
-                sum = str(int(position_1[-1]) + int(p_2[-1]) + int(p_3[-1]) + int(p_4[-1]) + int(position_5[-1]) +
-                          int(p_6[-1]) + int(p_7[-1]) + int(p_8[-1]) + int(position_9[-1]) + int(p_10[-1]))
-                if int(sum[-1]) != 0:
-                    break
-            control_sum = 10 - int(sum[-1])
-            self.generated_pesel = str(position_1) + str(position_2) + str(position_3) + str(position_4) + str(position_5) + str(position_6) + \
-                str(position_7) + str(position_8) + str(position_9) + \
-                str(position_10) + str(control_sum)
-            inf = ""
+            position_1 = int(self.kalendarz.get_date()[8])
+            position_2 = int(self.kalendarz.get_date()[9])
+            if self.kalendarz.get_date()[6:8] == "18":
+                position_3 = int(self.kalendarz.get_date()[3]) + 8
+            if self.kalendarz.get_date()[6:8] == "20":
+                position_3 = int(self.kalendarz.get_date()[3]) + 2
+            if self.kalendarz.get_date()[6:8] == "21":
+                position_3 = int(self.kalendarz.get_date()[3]) + 4
+            if self.kalendarz.get_date()[6:8] == "22":
+                position_3 = int(self.kalendarz.get_date()[3]) + 6
+            if self.kalendarz.get_date()[6:8] == "19":
+                position_3 = int(self.kalendarz.get_date()[3])
+            position_4 = int(self.kalendarz.get_date()[4])
+            position_5 = int(self.kalendarz.get_date()[0])
+            position_6 = int(self.kalendarz.get_date()[1])
+            position_7 = random.randint(0, 9)
+            position_8 = random.randint(0, 9)
+            position_10 = int(random.choice(num_list))
+            control_sum = position_1 + (position_2 * 3) + (position_3 * 7) + (position_4 * 9) + position_5 + (position_6 * 3) + (position_7 * 7) + (position_8 * 9) + (position_10 * 3)
+            ctrl_sum = control_sum
+            while control_sum % 10 == 0:
+                position_9 = random.randint(0, 9)                
+                control_sum += position_9
+            last_sign = str(control_sum)[-1]
+            position_9 = control_sum - ctrl_sum
+            position_11 = 10 - int(last_sign)
+            list_of_numbers = [position_1, position_2, position_3, position_4, position_5, position_6,
+                               position_7, position_8, position_9, position_10, position_11]
+            self.generated_pesel = ''.join(map(str, list_of_numbers))
             self.L4.config(text=self.generated_pesel)
-            self.L4a.config(text=inf)
             self.copy_button0.config(state=ACTIVE)
         elif self.woman.get() == 1:
             num_list = [0, 2, 4, 6, 8]
-            while True:
-                position_1 = self.kalendarz.get_date()[8]
-                position_2 = self.kalendarz.get_date()[9]
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "8" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 8
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "8" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 9
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "0" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 2
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "0" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 3
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "1" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 4
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "1" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 5
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "2" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = 6
-                if self.kalendarz.get_date()[6] == "2" and self.kalendarz.get_date()[7] == "2" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = 7
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "9" and self.kalendarz.get_date()[3] == "0":
-                    position_3 = self.kalendarz.get_date()[3]
-                if self.kalendarz.get_date()[6] == "1" and self.kalendarz.get_date()[7] == "9" and self.kalendarz.get_date()[3] == "1":
-                    position_3 = self.kalendarz.get_date()[3]
-                position_4 = self.kalendarz.get_date()[4]
-                position_5 = self.kalendarz.get_date()[0]
-                position_6 = self.kalendarz.get_date()[1]
-                position_7 = random.randint(0, 9)
-                position_8 = random.randint(0, 9)
-                position_9 = str(random.randint(0, 9))
-                position_10 = random.choice(num_list)
-                p_2 = str(position_2 * 3)
-                p_3 = str(position_3 * 7)
-                p_4 = str(position_4 * 9)
-                p_6 = str(position_6 * 3)
-                p_7 = str(position_7 * 7)
-                p_8 = str(position_8 * 9)
-                p_10 = str(position_10 * 3)
-                sum = str(int(position_1[-1]) + int(p_2[-1]) + int(p_3[-1]) + int(p_4[-1]) + int(position_5[-1]) +
-                          int(p_6[-1]) + int(p_7[-1]) + int(p_8[-1]) + int(position_9[-1]) + int(p_10[-1]))
-                if int(sum[-1]) != 0:
-                    break
-            control_sum = 10 - int(sum[-1])
-            self.generated_pesel = str(position_1) + str(position_2) + str(position_3) + str(position_4) + str(position_5) + str(position_6) + \
-                str(position_7) + str(position_8) + str(position_9) + \
-                str(position_10) + str(control_sum)
-            inf = ""
+            position_1 = int(self.kalendarz.get_date()[8])
+            position_2 = int(self.kalendarz.get_date()[9])
+            if self.kalendarz.get_date()[6:8] == "18":
+                position_3 = int(self.kalendarz.get_date()[3]) + 8
+            if self.kalendarz.get_date()[6:8] == "20":
+                position_3 = int(self.kalendarz.get_date()[3]) + 2
+            if self.kalendarz.get_date()[6:8] == "21":
+                position_3 = int(self.kalendarz.get_date()[3]) + 4
+            if self.kalendarz.get_date()[6:8] == "22":
+                position_3 = int(self.kalendarz.get_date()[3]) + 6
+            if self.kalendarz.get_date()[6:8] == "19":
+                position_3 = int(self.kalendarz.get_date()[3])
+            position_4 = int(self.kalendarz.get_date()[4])
+            position_5 = int(self.kalendarz.get_date()[0])
+            position_6 = int(self.kalendarz.get_date()[1])
+            position_7 = random.randint(0, 9)
+            position_8 = random.randint(0, 9)
+            position_10 = int(random.choice(num_list))
+            control_sum = position_1 + (position_2 * 3) + (position_3 * 7) + (position_4 * 9) + position_5 + (position_6 * 3) + (position_7 * 7) + (position_8 * 9) + (position_10 * 3)
+            ctrl_sum = control_sum
+            while control_sum % 10 == 0:
+                position_9 = random.randint(0, 9)                
+                control_sum += position_9
+            last_sign = str(control_sum)[-1]
+            position_9 = control_sum - ctrl_sum
+            position_11 = 10 - int(last_sign)
+            list_of_numbers = [position_1, position_2, position_3, position_4, position_5, position_6,
+                               position_7, position_8, position_9, position_10, position_11]
+            self.generated_pesel = ''.join(map(str, list_of_numbers))
             self.L4.config(text=self.generated_pesel)
-            self.L4a.config(text=inf)
             self.copy_button0.config(state=ACTIVE)
 
     def zodiaq(self):
@@ -1956,51 +1920,35 @@ class PESEL(tk.Toplevel):
                 dob_for_pesel = str(day_of_birth) + \
                     str(month_of_birth) + str(year_of_birth)
                 num_list = [1, 3, 5, 7, 9]
-                while True:
-                    position_1 = dob_for_pesel[6]
-                    position_2 = dob_for_pesel[7]
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "8" and dob_for_pesel[2] == "0":
-                        position_3 = 8
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "8" and dob_for_pesel[2] == "1":
-                        position_3 = 9
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "0" and dob_for_pesel[2] == "0":
-                        position_3 = 2
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "0" and dob_for_pesel[2] == "1":
-                        position_3 = 3
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "1" and dob_for_pesel[2] == "0":
-                        position_3 = 4
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "1" and dob_for_pesel[2] == "1":
-                        position_3 = 5
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "2" and dob_for_pesel[2] == "0":
-                        position_3 = 6
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "2" and dob_for_pesel[2] == "1":
-                        position_3 = 7
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "9" and dob_for_pesel[2] == "0":
-                        position_3 = dob_for_pesel[2]
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "9" and dob_for_pesel[2] == "1":
-                        position_3 = dob_for_pesel[2]
-                    position_4 = dob_for_pesel[3]
-                    position_5 = dob_for_pesel[0]
-                    position_6 = dob_for_pesel[1]
-                    position_7 = random.randint(0, 9)
-                    position_8 = random.randint(0, 9)
-                    position_9 = str(random.randint(0, 9))
-                    position_10 = random.choice(num_list)
-                    p_2 = position_2 * 3
-                    p_3 = str(position_3 * 7)
-                    p_4 = position_4 * 9
-                    p_6 = position_6 * 3
-                    p_7 = str(position_7 * 7)
-                    p_8 = str(position_8 * 9)
-                    p_10 = str(position_10 * 3)
-                    sum = str(int(position_1[-1]) + int(p_2[-1]) + int(p_3[-1]) + int(p_4[-1]) + int(position_5[-1]) +
-                              int(p_6[-1]) + int(p_7[-1]) + int(p_8[-1]) + int(position_9[-1]) + int(p_10[-1]))
-                    if int(sum[-1]) != 0:
-                        break
-                control_sum = 10 - int(sum[-1])
-                self.generated_pesel = str(position_1) + str(position_2) + str(position_3) + str(position_4) + str(position_5) + str(position_6) + \
-                    str(position_7) + str(position_8) + str(position_9) + \
-                    str(position_10) + str(control_sum)
+                position_1 = int(dob_for_pesel[6])
+                position_2 = int(dob_for_pesel[7])
+                if dob_for_pesel[4:6] == "18":
+                    position_3 = int(dob_for_pesel[2]) + 8
+                if dob_for_pesel[4:6] == "20":
+                    position_3 = int(dob_for_pesel[2]) + 2
+                if dob_for_pesel[4:6] == "21":
+                    position_3 = int(dob_for_pesel[2]) + 4
+                if dob_for_pesel[4:6] == "22":
+                    position_3 = int(dob_for_pesel[2]) + 6
+                if dob_for_pesel[4:6] == "19":
+                    position_3 = int(dob_for_pesel[2])    
+                position_4 = int(dob_for_pesel[3])
+                position_5 = int(dob_for_pesel[0])
+                position_6 = int(dob_for_pesel[1])
+                position_7 = random.randint(0, 9)
+                position_8 = random.randint(0, 9)
+                position_10 = int(random.choice(num_list))
+                control_sum = position_1 + (position_2 * 3) + (position_3 * 7) + (position_4 * 9) + position_5 + (position_6 * 3) + (position_7 * 7) + (position_8 * 9) + (position_10 * 3)
+                ctrl_sum = control_sum
+                while control_sum % 10 == 0:
+                    position_9 = random.randint(0, 9)                
+                    control_sum += position_9
+                last_sign = str(control_sum)[-1]
+                position_9 = control_sum - ctrl_sum
+                position_11 = 10 - int(last_sign)
+                list_of_numbers = [position_1, position_2, position_3, position_4, position_5, position_6,
+                                position_7, position_8, position_9, position_10, position_11]
+                self.generated_pesel = ''.join(map(str, list_of_numbers))
                 self.zodiaq()
                 self.telefon()
                 self.mail()
@@ -2027,51 +1975,35 @@ class PESEL(tk.Toplevel):
                 dob_for_pesel = str(day_of_birth) + \
                     str(month_of_birth) + str(year_of_birth)
                 num_list = [0, 2, 4, 6, 8]
-                while True:
-                    position_1 = dob_for_pesel[6]
-                    position_2 = dob_for_pesel[7]
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "8" and dob_for_pesel[2] == "0":
-                        position_3 = 8
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "8" and dob_for_pesel[2] == "1":
-                        position_3 = 9
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "0" and dob_for_pesel[2] == "0":
-                        position_3 = 2
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "0" and dob_for_pesel[2] == "1":
-                        position_3 = 3
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "1" and dob_for_pesel[2] == "0":
-                        position_3 = 4
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "1" and dob_for_pesel[2] == "1":
-                        position_3 = 5
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "2" and dob_for_pesel[2] == "0":
-                        position_3 = 6
-                    if dob_for_pesel[4] == "2" and dob_for_pesel[5] == "2" and dob_for_pesel[2] == "1":
-                        position_3 = 7
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "9" and dob_for_pesel[2] == "0":
-                        position_3 = dob_for_pesel[2]
-                    if dob_for_pesel[4] == "1" and dob_for_pesel[5] == "9" and dob_for_pesel[2] == "1":
-                        position_3 = dob_for_pesel[2]
-                    position_4 = dob_for_pesel[3]
-                    position_5 = dob_for_pesel[0]
-                    position_6 = dob_for_pesel[1]
-                    position_7 = random.randint(0, 9)
-                    position_8 = random.randint(0, 9)
-                    position_9 = str(random.randint(0, 9))
-                    position_10 = random.choice(num_list)
-                    p_2 = position_2 * 3
-                    p_3 = str(position_3 * 7)
-                    p_4 = position_4 * 9
-                    p_6 = position_6 * 3
-                    p_7 = str(position_7 * 7)
-                    p_8 = str(position_8 * 9)
-                    p_10 = str(position_10 * 3)
-                    sum = str(int(position_1[-1]) + int(p_2[-1]) + int(p_3[-1]) + int(p_4[-1]) + int(position_5[-1]) +
-                              int(p_6[-1]) + int(p_7[-1]) + int(p_8[-1]) + int(position_9[-1]) + int(p_10[-1]))
-                    if int(sum[-1]) != 0:
-                        break
-                control_sum = 10 - int(sum[-1])
-                self.generated_pesel = str(position_1) + str(position_2) + str(position_3) + str(position_4) + str(position_5) + str(position_6) + \
-                    str(position_7) + str(position_8) + str(position_9) + \
-                    str(position_10) + str(control_sum)
+                position_1 = dob_for_pesel[6]
+                position_2 = dob_for_pesel[7]
+                if dob_for_pesel[4:6] == "18":
+                    position_3 = dob_for_pesel[2] + 8
+                if dob_for_pesel[4:6] == "20":
+                    position_3 = dob_for_pesel[2] + 2
+                if dob_for_pesel[4:6] == "21":
+                    position_3 = dob_for_pesel[2] + 4
+                if dob_for_pesel[4:6] == "22":
+                    position_3 = dob_for_pesel[2] + 6
+                if dob_for_pesel[4:6] == "19":
+                    position_3 = dob_for_pesel[2]    
+                position_4 = dob_for_pesel[3]
+                position_5 = dob_for_pesel[0]
+                position_6 = dob_for_pesel[1]
+                position_7 = random.randint(0, 9)
+                position_8 = random.randint(0, 9)
+                position_10 = int(random.choice(num_list))
+                control_sum = position_1 + (position_2 * 3) + (position_3 * 7) + (position_4 * 9) + position_5 + (position_6 * 3) + (position_7 * 7) + (position_8 * 9) + (position_10 * 3)
+                ctrl_sum = control_sum
+                while control_sum % 10 == 0:
+                    position_9 = random.randint(0, 9)                
+                    control_sum += position_9
+                last_sign = str(control_sum)[-1]
+                position_9 = control_sum - ctrl_sum
+                position_11 = 10 - int(last_sign)
+                list_of_numbers = [position_1, position_2, position_3, position_4, position_5, position_6,
+                                position_7, position_8, position_9, position_10, position_11]
+                self.generated_pesel = ''.join(map(str, list_of_numbers))
                 self.zodiaq()
                 self.telefon()
                 self.mail()
@@ -2524,7 +2456,7 @@ Diety zagraniczne:
 -
 
 PESEL:
-- niewlasciwa suma kontrolna wygenerowanego peselu przy tworzeniu tozsamosci
+-
 
 Kalkulator walut:
 -
