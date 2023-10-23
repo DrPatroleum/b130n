@@ -201,68 +201,51 @@ class KodyQR(tk.Toplevel):
     def strona_pierwsza(self):
         self.page1 = tk.Frame(self)
         self.data_label = Label(self.page1, text="Wprowadź dane do wygenerowania kodu QR:")
-        self.data_label.pack()
+        self.data_label.grid(row=0, column=0, columnspan=2)
 
         self.data_entry = Entry(self.page1, width=40)
-        self.data_entry.pack()
+        self.data_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
-        self.version_label = Label(self.page1, text="Wybierz wersję kodu QR (1-40):")
-        self.version_label.pack()
-
-        self.version_var = StringVar()
-        self.version_var.set("1")
-        self.version_option_menu = OptionMenu(self.page1, self.version_var, *map(str, range(1, 41)))
-        self.version_option_menu.pack()
-
-        self.error_correction_label = Label(self.page1, text="Wybierz poziom korekcji błędów:")
-        self.error_correction_label.pack()
-
-        self.error_correction_var = StringVar()
-        self.error_correction_var.set("H")
-        self.error_correction_option_menu = OptionMenu(self.page1, self.error_correction_var, "L", "M", "Q", "H")
-        self.error_correction_option_menu.pack()
-
-        self.box_size_label = Label(self.page1, text="Wybierz rozmiar box (1-10):")
-        self.box_size_label.pack()
+        self.box_size_label = Label(self.page1, text="Wybierz rozmiar kwadratu (1-10):")
+        self.box_size_label.grid(row=2, column=0, sticky=EW)
 
         self.box_size_var = StringVar()
         self.box_size_var.set("5")
         self.box_size_option_menu = OptionMenu(self.page1, self.box_size_var, *map(str, range(1, 11)))
-        self.box_size_option_menu.pack()
+        self.box_size_option_menu.grid(row=2, column=1)
 
-        self.border_label = Label(self.page1, text="Wybierz border (0-10):")
-        self.border_label.pack()
+        self.border_label = Label(self.page1, text="Wybierz grubość ramki (0-10):")
+        self.border_label.grid(row=3, column=0, sticky=EW)
 
         self.border_var = StringVar()
         self.border_var.set("2")
         self.border_option_menu = OptionMenu(self.page1, self.border_var, *map(str, range(11)))
-        self.border_option_menu.pack()
+        self.border_option_menu.grid(row=3, column=1)
 
-        self.browse_button = Button(self.page1, text="Przeglądaj", command=self.browse_folder)
-        self.browse_button.pack()
+        self.browse_button = Button(self.page1, text="GDZIE ZAPISAĆ PLIK?", command=self.browse_folder)
+        self.browse_button.grid(row=4, column=0, columnspan=2)
 
-        self.generate_button = Button(self.page1, text="Generuj QR", command=self.generate_qr, state=DISABLED)
-        self.generate_button.pack()
+        self.generate_button = Button(self.page1, text="GENERUJ QR", command=self.generate_qr, state=DISABLED)
+        self.generate_button.grid(row=5, column=0, sticky=EW)
+        
+        self.back_button = Button(self.page1, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_button.grid(row=5, column=1, sticky=EW)
 
         self.result_label = Label(self.page1)
-        self.result_label.pack()
-
+        self.result_label.grid(row=6, column=0, columnspan=2)
+    
     def generate_unique_filename(self, folder, base_filename):
         unique_filename = base_filename
         counter = 1
         while os.path.exists(os.path.join(folder, unique_filename)):
-            unique_filename = f"{base_filename}_{counter}"
+            unique_filename = f"qr_code_{counter}.jpg"
             counter += 1
         return os.path.join(folder, unique_filename)
 
 
-    def qr_generate(self, data, version, error_correction, box_size, border, save_folder):
+    def qr_generate(self, data, box_size, border, save_folder):
         filename = "qr_code.jpg"
         save_path = os.path.join(save_folder, filename)
-        error_correction_mapping = {"L": qrcode.constants.ERROR_CORRECT_L,
-                                "M": qrcode.constants.ERROR_CORRECT_M,
-                                "Q": qrcode.constants.ERROR_CORRECT_Q,
-                                "H": qrcode.constants.ERROR_CORRECT_H}
 
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
@@ -271,8 +254,8 @@ class KodyQR(tk.Toplevel):
             save_path = self.generate_unique_filename(save_folder, "qr_code.jpg")
 
         qr = qrcode.QRCode(
-            version=version,
-            error_correction=error_correction_mapping[error_correction],
+            version=None,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=box_size,
             border=border)
         
@@ -280,7 +263,7 @@ class KodyQR(tk.Toplevel):
         qr.make(fit=True)
         img = qr.make_image(fill_color='black', back_color='white')
         img.save(save_path)
-        info = f"Kod QR wygenerowano do pliku {save_path}"
+        info = f"Kod QR wygenerowano pomyślnie!"
         messagebox.showinfo('Śliwka Coding Center ©', info)
 
 
@@ -292,25 +275,19 @@ class KodyQR(tk.Toplevel):
 
     def generate_qr(self):
         data = self.data_entry.get()
-        version = int(self.version_var.get())
-        error_correction = self.error_correction_var.get()
         box_size = int(self.box_size_var.get())
         border = int(self.border_var.get())
 
         if data:
-            if version > 0 and version <= 40:
-                if box_size >= 1 and box_size <= 10:
-                    if border >= 0 and border <= 10:
-                        self.qr_generate(data, version, error_correction,
-                                    box_size, border, folder_path)
-                    else:
-                        self.result_label.config(
-                            text="Wprowadź poprawny border (od 0 do 10).")
+            if box_size >= 1 and box_size <= 10:
+                if border >= 0 and border <= 10:
+                    self.qr_generate(data,box_size, border, folder_path)
                 else:
                     self.result_label.config(
-                        text="Wprowadź poprawny box size (od 1 do 10).")
+                        text="Wprowadź poprawny border (od 0 do 10).")
             else:
-                self.result_label.config(text="Wprowadź poprawną wersję (od 1 do 40).")
+                self.result_label.config(
+                    text="Wprowadź poprawny box size (od 1 do 10).")
         else:
             self.result_label.config(text="Wprowadź dane do wygenerowania kodu QR.")
         
@@ -328,11 +305,348 @@ class KodyQR(tk.Toplevel):
         self.destroy()
 
 class Planer(tk.Toplevel):
+    """wybor miejsca startu (domyslnie warszawa) i miejsca docelowego,
+    wybor srodka transportu
+    przeliczanie liczby kilometrow podrozy
+    wybor czasu pobytu w danym miejscu
+    co trzeba miec ze soba, jakie dokumenty
+    ile potrzebujesz pieniedzy
+    ile orientacyjnie moze kosztowac podroz
+    """
     pass
 
 
 class Tablice(tk.Toplevel):
-    pass
+    def __init__(self, menu_app):
+        super().__init__()
+        self.menu_app = menu_app
+        self.title("TABLICE REJESTRACYJNE")
+        self.protocol("WM_DELETE_WINDOW", self.on_close_window)
+        self.current_page = None
+        self.strona_pierwsza()
+
+        self.show_page(self.page1)
+
+    def strona_pierwsza(self):
+        self.page1 = tk.Frame(self)
+
+        self.label = tk.Label(self.page1, text="Wprowadź numer tablicy rejestracyjnej")
+        self.label.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
+        self.entry = tk.Entry(self.page1)
+        self.entry.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+
+        self.check_button = tk.Button(self.page1, text="SPRAWDŹ", command=self.check_tablica)
+        self.check_button.grid(row=2, column=0, padx=5, pady=5)
+        
+        self.back_to_menu_button = tk.Button(self.page1, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_to_menu_button.grid(row=2, column=1, padx=5, pady=5)
+
+        self.result_label = tk.Label(self.page1, text="")
+        self.result_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+        
+    def check_tablica(self):
+        tablice_dyplomatyczne_funkcja = {(0,199): "Prywatny pojazd personelu dyplomatycznego ambasady",
+                                        (200,299): "Prywatny pojazd attaché wojskowego",
+                                        (300,499): "Prywatny pojazd personelu niedyplomatycznego ambasady",
+                                        (500,501): "Służbowy pojazd ambasadora",
+                                        (502,699): "Służbowy pojazd ambasady",
+                                        (700,799): "Prywatny pojazd personelu dyplomatycznego konsulatu generalnego",
+                                        (800,899): "Prywatny pojazd personelu niedyplomatycznego konsulatu generalnego",
+                                        (900,901): "Służbowy pojazd konsula generalnego",
+                                        (902,999): "Służbowy pojazd konsulatu generalnego"}
+                                        
+        tablice_wojewodztwa = {"B": "podlaskie", "C": "kujawsko-pomorskie", "D": "dolnośląskie", "E": "łódzkie", "F": "lubuskie",
+                            "G": "pomorskie", "X": "pomorskie", "K": "małopolskie", "L": "lubelskie", "N": "warmińsko-mazurskie",
+                            "O": "opolskie", "P": "wielkopolskie", "R": "podkarpackie", "S": "śląskie", "T": "świętokrzyskie", "W": "mazowieckie",
+                            "Z": "zachodniopomorskie", "I": "śląskie", "J": "małopolskie", "M": "wielkopolskie", "Y": "podkarpackie",
+                            "V": "dolnośląskie", "A": "mazowieckie"}
+
+        tablice_dyplomatyczne_kraj = {"001": "USA", "002": "Wielka Brytania", "003": "Francja", "004": "Kanada",
+            "005": "Niemcy","006": "Holandia","007": "Włochy","008": "Austria","009": "Japonia",
+            "010": "Turcja","011": "Belgia","012": "Dania","013": "Norwegia","014": "Grecja",
+            "015": "Australia","016": "Algieria","017": "Afganistan","018": "Argentyna",
+            "019": "Brazylia","020": "Bangladesz","021": "Egipt","022": "Ekwador","023": "Finlandia",
+            "024": "Hiszpania","025": "Irak","026": "Iran","027": "Indie","028": "Indonezja",
+            "029": "Kolumbia","030": "Malezja","031": "Libia","032": "Maroko","033": "Meksyk",
+            "034": "Nigeria","035": "Pakistan","036": "Portugalia","037": "Palestyna","038": "Syria",
+            "039": "Szwecja","040": "Szwajcaria","041": "Tunezja","042": "Tajlandia","043": "Wenezuela",
+            "044": "Urugwaj","045": "Peru","046": "Jemen","047": "Kostaryka","048": "Kongo",
+            "049": "Izrael","050": "Nikaragua","051": "Chile","052": "Watykan","053": "Korea Południowa",
+            "054": "Przedstawicielstwo Komisji Wspólnot Europejskich","055": "Irlandia","056": "Bank Światowy",
+            "057": "Międzynarodowy Fundusz Walutowy","058": "Filipiny","059": "Międzynarodowa Korporacja Finansowa",
+            "060": "RPA","061": "Biuro Instytucji Demokratycznych i Praw Człowieka OBWE","062": "Cypr",
+            "063": "Kuwejt","064": "Organizacja Narodów Zjednoczonych","065": "Rosja","066": "Słowacja",
+            "067": "Czechy","068": "Bułgaria","069": "Węgry","070": "Rumunia","071": "Wietnam",
+            "072": "Serbia","073": "Korea Północna","074": "Kuba","075": "Albania","076": "Chiny",
+            "077": "Mongolia","078": "Międzynarodowa Organizacja Pracy","079": "Organizacja Kooperacyjna ds. Kolei",
+            "080": "Klub Dyplomatyczny","081": "Laos","082": "Angola","083": "Ukraina","084": "Europejski Bank Odbudowy i Rozwoju",
+            "085": "Litwa","086": "Białoruś","087": "Łotwa","088": "Chorwacja","089": "Liban",
+            "090": "Słowenia","091": "Gwatemala","092": "Estonia","093": "Macedonia","094": "Mołdawia",
+            "095": "Izrael","096": "Armenia","097": "Sri Lanka","098": "Kazachstan","099": "Arabia Saudyjska",
+            "100": "Gruzja","101": "Uzbekistan","102": "UN-HABITAT","103": "Nowa Zelandia","104": "Azerbejdżan",
+            "105": "Suwerenny Wojskowy Zakon Maltański","106": "Kambodża","107": "Frontex","108": "Luksemburg",
+            "109": "Bośnia i Hercegowina","110": "Panama","111": "Katar","112": "Malta",
+            "113": "Zjednoczone Emiraty Arabskie","114": "Czarnogóra","115": "Senegal"}
+
+        polskie_tablice_rejestracyjne = {"UA": "Siły zbrojne RP:\n samochód osobowy, osobowo-terenowy\n lub specjalny na podwoziu osobowym",
+        "UB": "Siły zbrojne RP:\n transporter opancerzony","UC": "Siły zbrojne RP:\n samochód dostawczy",
+        "UD": "Siły zbrojne RP:\n autobus","UE": "Siły zbrojne RP:\n samochód ciężarowy lub ciężarowo-terenowy\n o przeznaczeniu transportowym",
+        "UG": "Siły zbrojne RP:\n pojazd specjalny\n na podwoziu ciężarowym","UI": "Siły zbrojne RP:\n przyczepa transportowa",
+        "UJ": "Siły zbrojne RP:\n przyczepa specjalna","UK": "Siły zbrojne RP:\n motocykl","HSB": "Kontrola skarbowa\n woj. podlaskie","HSC": "Kontrola skarbowa\n woj. kujawsko-pomorskie","HSD": "Kontrola skarbowa\n woj. dolnośląskie",
+        "HSE": "Kontrola skarbowa\n woj. łódzkie","HSF": "Kontrola skarbowa\n woj. lubuskie",
+        "HSG": "Kontrola skarbowa\n woj. pomorskie","HSK": "Kontrola skarbowa\n woj. małopolskie",
+        "HSL": "Kontrola skarbowa\n woj. lubelskie","HSN": "Kontrola skarbowa\n woj. warmińsko-mazurskie",
+        "HSO": "Kontrola skarbowa\n woj. opolskie","HSP": "Kontrola skarbowa\n woj. wielkopolskie",
+        "HSR": "Kontrola skarbowa\n woj. podkarpackie","HSS": "Kontrola skarbowa\n woj. śląskie",
+        "HST": "Kontrola skarbowa\n woj. świętokrzyskie","HSW": "Kontrola skarbowa\n woj. mazowieckie",
+        "HSZ": "Kontrola skarbowa\n woj. zachodniopomorskie","HCA": "Służba celna Olsztyn",
+        "HCB": "Służba celna Białystok","HCC": "Służba celna Biała Podlaska",
+        "HCD": "Służba celna Przemyśl","HCE": "Służba celna Kraków","HCF": "Służba celna Katowice",
+        "HCG": "Służba celna Wrocław","HCH": "Służba celna Rzepin","HCJ": "Służba celna Szczecin",
+        "HCK": "Służba celna Gdynia","HCL": "Służba celna Warszawa","HCM": "Służba celna Toruń",
+        "HCN": "Służba celna Łódź","HCO": "Służba celna Poznań","HCP": "Służba celna Opole",
+        "HCR": "Służba celna Kielce","HPA": "Komenda Główna Policji","HPB": "Policja woj. dolnośląskie",
+        "HPC": "Policja woj. kujawsko-pomorskie","HPD": "Policja woj. lubelskie",
+        "HPE": "Policja woj. lubuskie","HPF": "Policja woj. łódzkie","HPG": "Policja woj. małopolskie",
+        "HPH": "Policja woj. mazowieckie","HPJ": "Policja woj. opolskie","HPK": "Policja woj. podkarpackie", "HPL": "Szkoła Policji w Szczytnie/Pile/Słupsku/Katowicach\n lub Centrum Szkolenia Policji w Legionowie",
+        "HPM": "Policja woj. podlaskie","HPN": "Policja woj. pomorskie","HPP": "Policja woj. śląskie",
+        "HPS": "Policja woj. świętokrzyskie","HPT": "Policja woj. warmińsko-mazurskie",
+        "HPU": "Policja woj. wielkopolskie","HPW": "Policja woj. zachodniopomorskie",
+        "HPZ": "Komenda Stołeczna Policji","HA": "Centralne Biuro Antykorupcyjne",
+        "HB": "Służba Ochrony Państwa","HK": "Agencja Bezpieczeństwa Wewnętrznego\n lub Agencja Wywiadu",
+        "HW": "Straż Graniczna","HM": "Służba Wywiadu Wojskowego\n lub Służba Kontrwywiadu Wojskowego", "BI":"Białystok","BS":"Suwałki","BL":"Łomża","BAU":"powiat augustowski",
+        "BIA":"powiat białostocki","BBI":"powiat bielski","BGR":"powiat grajewski","BHA":"powiat hajnowski",
+        "BKL":"powiat kolneński","BMN":"powiat moniecki","BSE":"powiat sejneński","BSI":"powiat siemiatycki",
+        "BSK":"powiat sokólski","BSU":"powiat suwalski","BWM":"powiat wysokomazowiecki","BZA":"powiat zambrowski",
+        "BLM":"powiat łomżyński","CB":"Bydgoszcz","CG":"Grudziądz","CT":"Toruń","CW":"Włocławek","CAL":"powiat aleksandrowski",
+        "CBR":"powiat brodnicki","CBY":"powiat bydgoski","CCH":"powiat chełmiński","CGD":"powiat golubsko-dobrzyński",
+        "CGR":"powiat grudziądzki","CIN":"powiat inowrocławski","CLI":"powiat lipnowski","CMG":"powiat mogileński",
+        "CNA":"powiat nakielski","CRA":"powiat radziejowski","CRY":"powiat rypiński","CSE":"powiat sępoleński",
+        "CSW":"powiat świecki","CTR":"powiat toruński","CTU":"powiat tucholski","CWA":"powiat wąbrzeski",
+        "CWL":"powiat włocławski","CZN":"powiat żniński","DJ":"Jelenia Góra","VJ":"Jelenia Góra","DL":"Legnica","DB":"Wałbrzych","VL":"Legnica","VB":"Wałbrzych","DW":"Wrocław", "DX":"Wrocław", "VW":"Wrocław", "VX":"Wrocław", "VBL":"powiat bolesławiecki",
+        "DBL":"powiat bolesławiecki", "VBL":"powiat bolesławiecki","DDZ":"powiat dzierżoniowski","VDZ":"powiat dzierżoniowski",
+        "DGR":"powiat górowski","VGR":"powiat górowski","DGL":"powiat głogowski","VGL":"powiat głogowski",
+        "DGL":"powiat głogowski", "VGL":"powiat głogowski","DJE":"powiat jeleniogórski", "VJE":"powiat jeleniogórski",
+        "DKA":"powiat kamiennogórski", "VKA":"powiat kamiennogórski","DKL":"powiat kłodzki", "VKL":"powiat kłodzki", 
+        "DLE":"powiat legnicki","VLE":"powiat legnicki","DLB":"powiat lubański","VLB":"powiat lubański",
+        "DLU":"powiat lubiński","VLU":"powiat lubiński","DLW":"powiat lwówecki","VLW":"powiat lwówecki",
+        "DMI":"powiat milicki","VMI":"powiat milicki","DOL":"powiat oleśnicki","VOL":"powiat oleśnicki",
+        "DOA":"powiat oławski","VOA":"powiat oławski","DPL":"powiat polkowicki","VPL":"powiat polkowicki",
+        "DSR":"powiat średzki","VSR":"powiat średzki","DST":"powiat strzeliński","VST":"powiat strzeliński",
+        "DSW":"powiat świdnicki","VSW":"powiat świdnicki","DTR":"powiat trzebnicki","VTR":"powiat trzebnicki",
+        "DBA":"powiat wałbrzyski","VBA":"powiat wałbrzyski","DWL":"powiat wołowski","VWL":"powiat wołowski",
+        "DWR":"powiat wrocławski","VWR":"powiat wrocławski","DZA":"powiat ząbkowicki","VZA":"powiat ząbkowicki",
+        "DZG":"powiat zgorzelecki","VZG":"powiat zgorzelecki","DZL":"powiat złotoryjski","VZL":"powiat złotoryjski", "ED":"Łódź",
+        "EP":"Piotrków Trybunalski","ES":"Skierniewice","EL":"Łódź","EBE":"powiat bełchatowski","EBR":"powiat brzeziński","EKU":"powiat kutnowski","EOP":"powiat opoczyński","EPA":"powiat pabianicki","EPJ":"powiat pajęczański","EPI":"powiat piotrkowski",
+        "EPD":"powiat poddębicki","ERA":"powiat radomszczański","ERW":"powiat rawski","ESI":"powiat sieradzki",
+        "ESK":"powiat skierniewicki","ETM":"powiat tomaszowski","EWI":"powiat wieluński","EWE":"powiat wieruszowski",
+        "EZD":"powiat zduńskowolski","EZG":"powiat zgierski","ELA":"powiat łaski","ELE":"powiat łęczycki",
+        "ELW":"powiat łódzki wschodni","ELC":"powiat łowicki","FG":"Gorzów Wielkopolski","FZ":"Zielona Góra",
+        "FGW":"powiat gorzowski","FKR":"powiat krośnieński","FMI":"powiat międzyrzecki","FNW":"powiat nowosolski",
+        "FSD":"powiat strzelecko-drezdenecki","FSU":"powiat sulęciński","FSW":"powiat świebodziński",
+        "FSL":"powiat słubicki","FWS":"powiat wschowski","FZG":"powiat żagański","FZA":"powiat żarski",
+        "FZI":"powiat zielonogórski","GD":"Gdańsk","XD":"Gdańsk","GA":"Gdynia","XA":"Gdynia",
+        "GSP":"Sopot","XSP":"Sopot","GS":"Słupsk","XS":"Słupsk","GBY":"powiat bytowski","XBY":"powiat bytowski",
+        "GCH":"powiat chojnicki","XCH":"powiat chojnicki","GCZ":"powiat człuchowski","XCZ":"powiat człuchowski",
+        "GDA":"powiat gdański","XDA":"powiat gdański","GKA":"powiat kartuski","GKY":"powiat kartuski","GKZ":"powiat kartuski",
+        "XKA":"powiat kartuski","XKY":"powiat kartuski","XKZ":"powiat kartuski","GKS":"powiat kościerski","XKS":"powiat kościerski",
+        "GKW":"powiat kwidzyński","XKW":"powiat kwidzyński","GLE":"powiat lęborski","XLE":"powiat lęborski",
+        "GMB":"powiat malborski","XMB":"powiat malborski","GND":"powiat nowodworski","XND":"powiat nowodworski",
+        "GPU":"powiat pucki","XPU":"powiat pucki","GST":"powiat starogardzki","XST":"powiat starogardzki",
+        "GSZ":"powiat sztumski","XSZ":"powiat sztumski","GSL":"powiat słupski","XSL":"powiat słupski",
+        "GTC":"powiat tczewski","XTC":"powiat tczewski","GWE":"powiat wejherowski","GWO":"powiat wejherowski",
+        "XWE":"powiat wejherowski","XWO":"powiat wejherowski","KK":"Kraków","KR":"Kraków", "JK":"Kraków","JR":"Kraków",
+        "KN":"Nowy Sącz","JN":"Nowy Sącz","KT":"Tarnów","JT":"Tarnów","KBC":"powiat bocheński","JBC":"powiat bocheński",
+        "KBA":"powiat bocheński","JBA":"powiat bocheński","KBR":"powiat brzeski","JBR":"powiat brzeski",
+        "KCH":"powiat chrzanowski","JCH":"powiat chrzanowski","KDA":"powiat dąbrowski","JDA":"powiat dąbrowski",
+        "KGR":"powiat gorlicki","JGR":"powiat gorlicki","KRA":"powiat krakowski","JRA":"powiat krakowski",
+        "KLI":"powiat limanowski","JLI":"powiat limanowski","KMI":"powiat miechowski","JMI":"powiat miechowski",
+        "KMY":"powiat myślenicki","JMY":"powiat myślenicki","KNS":"powiat nowosądecki","JNS":"powiat nowosądecki",
+        "KNT":"powiat nowotarski","JNT":"powiat nowotarski","KOL":"powiat olkuski","JOL":"powiat olkuski",
+        "KOS":"powiat oświęcimski","JOS":"powiat oświęcimski","KPR":"powiat proszowicki","JPR":"powiat proszowicki",
+        "KSU":"powiat suski","JSU":"powiat suski","KTA":"powiat tarnowski","JTA":"powiat tarnowski",
+        "KTT":"powiat tatrzański","JTT":"powiat tatrzański","KWA":"powiat wadowicki", "JWA":"powiat wadowicki",
+        "KWI":"powiat wielicki", "JWI":"powiat wielicki","LB":"Biała Podlaska","LC":"Chełm","LU":"Lublin","LZ":"Zamość","LBI":"powiat bialski","LBL":"powiat biłgorajski","LCH":"powiat chełmski","LHR":"powiat hrubieszowski","LJA":"powiat janowski","LKR":"powiat kraśnicki",
+        "LKS":"powiat krasnostawski","LLB":"powiat lubartowski","LUB":"powiat lubelski","LOP":"powiat opolski",
+        "LPA":"powiat parczewski","LPU":"powiat puławski","LRA":"powiat radzyński","LRY":"powiat rycki",
+        "LSW":"powiat świdnicki","LTM":"powiat tomaszowski","LWL":"powiat włodawski","LZA":"powiat zamojski",
+        "LLE":"powiat łęczyński","LLU":"powiat łukowski","NE":"Elbląg","NO":"Olsztyn","NBA":"powiat bartoszycki",
+        "NBR":"powiat braniewski","NDZ":"powiat działdowski","NEB":"powiat elbląski","NEL":"powiat ełcki",
+        "NGI":"powiat giżycki","NGO":"powiat gołdapski","NIL":"powiat iławski","NKE":"powiat kętrzyński",
+        "NLI":"powiat lidzbarski","NMR":"powiat mrągowski","NNI":"powiat nidzicki","NNM":"powiat nowomiejski",
+        "NOE":"powiat olecki","NOL":"powiat olsztyński","NOS":"powiat ostródzki","NPI":"powiat piski",
+        "NSZ":"powiat szczycieński","NWE":"powiat węgorzewski","OP":"Opole","OB":"powiat brzeski","OGL":"powiat głubczycki",
+        "OK":"powiat kędzierzyńsko-kozielski","OKL":"powiat kluczborski","OKR":"powiat krapkowicki",
+        "ONA":"powiat namysłowski","ONY":"powiat nyski","OOL":"powiat oleski","OPO":"powiat opolski",
+        "OPR":"powiat prudnicki","OST":"powiat strzelecki","PK":"Kalisz","PA":"Kalisz","MK":"Kalisz","MA":"Kalisz",
+        "PN":"Konin","PKO":"Konin","MN":"Konin","MKO":"Konin","PL":"Leszno","ML":"Leszno","PO":"Poznań","MO":"Poznań",
+        "PY":"Poznań","MY":"Poznań","PCH":"powiat chodzieski","MCH":"powiat chodzieski",
+        "PCT":"powiat czarnkowsko-trzcianecki","MCT":"powiat czarnkowsko-trzcianecki",
+        "PGN":"powiat gnieźnieński","MGN":"powiat gnieźnieński","PGS":"powiat gostyński","MGS":"powiat gostyński",
+        "PGO":"powiat grodziski","MGO":"powiat grodziski","PJA":"powiat jarociński","MJA":"powiat jarociński",
+        "PKA":"powiat kaliski","MKA":"powiat kaliski","PKE":"powiat kępiński","MKE":"powiat kępiński",
+        "PKL":"powiat kolski","MKL":"powiat kolski","PKN":"powiat koniński","MKN":"powiat koniński",
+        "PKS":"powiat kościański","MKS":"powiat kościański","PKR":"powiat krotoszyński","MKR":"powiat krotoszyński",
+        "PLE":"powiat leszczyński","MLE":"powiat leszczyński","PMI":"powiat międzychodzki","MMI":"powiat międzychodzki",
+        "PNT":"powiat nowotomyski","MNT":"powiat nowotomyski","POB":"powiat obornicki","MOB":"powiat obornicki",
+        "POS":"powiat ostrowski","MOS":"powiat ostrowski","POT":"powiat ostrzeszowski","MOT":"powiat ostrzeszowski",
+        "PP":"powiat pilski","MP":"powiat pilski","PPL":"powiat pleszewski","MPL":"powiat pleszewski",
+        "PZ":"powiat poznański","POZ":"powiat poznański","MZ":"powiat poznański","MOZ":"powiat poznański",
+        "PRA":"powiat rawicki","MRA":"powiat rawicki","PSR":"powiat średzki","MSR":"powiat średzki",
+        "PSE":"powiat śremski","MSE":"powiat śremski","PSZ":"powiat szamotulski","MSZ":"powiat szamotulski",
+        "PSL":"powiat słupecki","MSL":"powiat słupecki","PTU":"powiat turecki","MTU":"powiat turecki",
+        "PWA":"powiat wągrowiecki","MWA":"powiat wągrowiecki","PWL":"powiat wolsztyński","MWL":"powiat wolsztyński",
+        "PWR":"powiat wrzesiński","MWR":"powiat wrzesiński","PZL":"powiat złotowski","MZL":"powiat złotowski",
+        "RK":"Krosno","YK":"Krosno","RP":"Przemyśl","YP":"Przemyśl","RZ":"Rzeszów","YZ":"Rzeszów",
+        "RT":"Tarnobrzeg", "YT":"Tarnobrzeg","RBI":"powiat bieszczadzki","YBI":"powiat bieszczadzki",
+        "RBR":"powiat brzozowski","YBR":"powiat brzozowski","RDE":"powiat dębicki","YDE":"powiat dębicki",
+        "RJA":"powiat jarosławski","YJA":"powiat jarosławski","RJS":"powiat jasielski","YJS":"powiat jasielski",
+        "RKL":"powiat kolbuszowski","YKL":"powiat kolbuszowski","RKR":"powiat krośnieński","YKR":"powiat krośnieński",
+        "RLS":"powiat leski","YLS":"powiat leski","RLE":"powiat leżajski","YLE":"powiat leżajski",
+        "RLU":"powiat lubaczowski","YLU":"powiat lubaczowski","RMI":"powiat mielecki","YMI":"powiat mielecki",
+        "RNI":"powiat niżański","YNI":"powiat niżański","RPR":"powiat przemyski","YPR":"powiat przemyski",
+        "RPZ":"powiat przeworski","YPZ":"powiat przeworski","RRS":"powiat ropczycko-sędziszowski","YRS":"powiat ropczycko-sędziszowski",
+        "RZE":"powiat rzeszowski","RZZ":"powiat rzeszowski","RZR":"powiat rzeszowski","YZE":"powiat rzeszowski","YZZ":"powiat rzeszowski","YZR":"powiat rzeszowski","RSA":"powiat sanocki","YSA":"powiat sanocki","RST":"powiat stalowowolski","YST":"powiat stalowowolski",
+        "RSR":"powiat strzyżowski","YSR":"powiat strzyżowski","RTA":"powiat tarnobrzeski","YTA":"powiat tarnobrzeski",
+        "RLA":"powiat łańcucki","YLA":"powiat łańcucki","SB":"Bielsko-Biała","IB":"Bielsko-Biała",
+        "SY":"Bytom","IY":"Bytom","SH":"Chorzów","IH":"Chorzów","SC":"Częstochowa","IC":"Częstochowa",
+        "SD":"Dąbrowa Górnicza","ID":"Dąbrowa Górnicza","SG":"Gliwice","IG":"Gliwice","SJZ":"Jastrzębie-Zdrój","IJZ":"Jastrzębie-Zdrój",
+        "SJ":"Jaworzno","IJ":"Jaworzno","SK":"Katowice","IK":"Katowice","SM":"Mysłowice","IM":"Mysłowice",
+        "SPI":"Piekary Śląskie","IPI":"Piekary Śląskie","SL":"Ruda Śląska","SRS":"Ruda Śląska","IL":"Ruda Śląska","IRS":"Ruda Śląska",
+        "SR":"Rybnik","IR":"Rybnik","SI":"Siemianowice Śląskie","II":"Siemianowice Śląskie","SO":"Sosnowiec","IO":"Sosnowiec",
+        "SW":"Świętochłowice","IW":"Świętochłowice","ST":"Tychy","IT":"Tychy","SZ":"Zabrze","IZ":"Zabrze","SZO":"Żory","IZO":"Żory",
+        "SBE":"powiat będziński","SE":"powiat będziński","SBN":"powiat będziński","IBE":"powiat będziński","IE":"powiat będziński","IBN":"powiat będziński","SBI":"powiat bielski","IBI":"powiat bielski","SBL":"powiat bieruńsko-lędziński","IBL":"powiat bieruńsko-lędziński","SCI":"powiat cieszyński","SCN":"powiat cieszyński","ICI":"powiat cieszyński","ICN":"powiat cieszyński",
+        "SCZ":"powiat częstochowski","ICZ":"powiat częstochowski","SGL":"powiat gliwicki","IGL":"powiat gliwicki",
+        "SKL":"powiat kłobucki","IKL":"powiat kłobucki","SLU":"powiat lubliniecki","ILU":"powiat lubliniecki",
+        "SMI":"powiat mikołowski","IMI":"powiat mikołowski","SMY":"powiat myszkowski","IMY":"powiat myszkowski",
+        "SPS":"powiat pszczyński","IPS":"powiat pszczyński","SRC":"powiat raciborski","IRC":"powiat raciborski",
+        "SRB":"powiat rybnicki","IRB":"powiat rybnicki","STA":"powiat tarnogórski","ITA":"powiat tarnogórski",
+        "IWD":"powiat wodzisławski","IWZ":"powiat wodzisławski","SWD":"powiat wodzisławski","SWZ":"powiat wodzisławski",
+        "SZA":"powiat zawierciański","IZA":"powiat zawierciański","SZY":"powiat żywiecki","IZY":"powiat żywiecki",
+        "TK":"Kielce","TBU":"powiat buski","TJE":"powiat jędrzejowski","TKA":"powiat kazimierski","TKI":"powiat kielecki",
+        "TKN":"powiat konecki","TOP":"powiat opatowski","TOS":"powiat ostrowiecki","TPI":"powiat pińczowski",
+        "TSA":"powiat sandomierski","TSK":"powiat skarżyski","TST":"powiat starachowicki","TSZ":"powiat staszowski",
+        "TLW":"powiat włoszczowski","WO":"Ostrołęka", "AO":"Ostrołęka","WP":"Płock","AP":"Płock","WR":"Radom","AR":"Radom",
+        "WS":"Siedlce", "AS":"Siedlce","WB":"Warszawa Bemowo", "AB":"Warszawa Bemowo",
+        "WA":"Warszawa Białołęka", "AA":"Warszawa Białołęka","WD":"Warszawa Bielany", "AD":"Warszawa Bielany",
+        "WE":"Warszawa Mokotów", "AE":"Warszawa Mokotów","WU":"Warszawa Ochota","AU":"Warszawa Ochota",
+        "WH":"Warszawa Praga Północ","AH":"Warszawa Praga Północ","WF":"Warszawa Praga Południe", "AF":"Warszawa Praga Południe",
+        "WI":"Warszawa Śródmieście", "AI":"Warszawa Śródmieście","WJ":"Warszawa Targówek","AJ":"Warszawa Targówek",
+        "WK":"Warszawa Ursus","AK":"Warszawa Ursus","WN":"Warszawa Ursynów","AN":"Warszawa Ursynów",
+        "WT":"Warszawa Wawer","AT":"Warszawa Wawer","WBR":"powiat białobrzeski","ABR":"powiat białobrzeski",
+        "WCI":"powiat ciechanowski","ACI":"powiat ciechanowski","WG":"powiat garwoliński","AG":"powiat garwoliński",
+        "WGS":"powiat gostyniński","AGS":"powiat gostyniński","WGM":"powiat grodziski","AGM":"powiat grodziski",
+        "WGR":"powiat grójecki","AGR":"powiat grójecki","WKZ":"powiat kozienicki","AKZ":"powiat kozienicki",
+        "WL":"powiat legionowski","AL":"powiat legionowski","WLI":"powiat lipski","ALI":"powiat lipski",
+        "WMA":"powiat makowski","AMA":"powiat makowski","WM":"powiat miński","AM":"powiat miński",
+        "WML":"powiat mławski","AML":"powiat mławski","WND":"powiat nowodworski","AND":"powiat nowodworski",
+        "WOR":"powiat ostrowski","AOR":"powiat ostrowski","WOS":"powiat ostrołęcki","AOS":"powiat ostrołęcki",
+        "WOT":"powiat otwocki","AOT":"powiat otwocki","WPI":"powiat piaseczyński", "WPA":"powiat piaseczyński", "WPW":"powiat piaseczyński", "WPX":"powiat piaseczyński","API":"powiat piaseczyński", "APA":"powiat piaseczyński", "APW":"powiat piaseczyński", "APX":"powiat piaseczyński","WPS":"powiat pruszkowski", "WPR":"powiat pruszkowski", "WPP":"powiat pruszkowski",
+        "APS":"powiat pruszkowski", "APR":"powiat pruszkowski", "APP":"powiat pruszkowski",
+        "WPZ":"powiat przasnyski","APZ":"powiat przasnyski","WPY":"powiat przysuski","APY":"powiat przysuski",
+        "WPU":"powiat pułtuski","APU":"powiat pułtuski","WPL":"powiat płocki","APL":"powiat płocki",
+        "WPN":"powiat płoński","APN":"powiat płoński","WRA":"powiat radomski","ARA":"powiat radomski",
+        "WSI":"powiat siedlecki","ASI":"powiat siedlecki","WSE":"powiat sierpecki","ASE":"powiat sierpecki",
+        "WSC":"powiat sochaczewski","ASC":"powiat sochaczewski","WSK":"powiat sokołowski","ASK":"powiat sokołowski",
+        "WSZ":"powiat szydłowiecki","ASZ":"powiat szydłowiecki","WZ":"powiat warszawski zachodni","AZ":"powiat warszawski zachodni",
+        "WWE":"powiat węgrowski","AWE":"powiat węgrowski","WWL":"powiat wołomiński","AWL":"powiat wołomiński",
+        "WV":"powiat wołomiński","AV":"powiat wołomiński","WWY":"powiat wyszkowski","AWY":"powiat wyszkowski",
+        "WZU":"powiat żuromiński","AZU":"powiat żuromiński","WZW":"powiat zwoleński","AZW":"powiat zwoleński",
+        "WZY":"powiat żyrardowski","AZY":"powiat żyrardowski","WLS":"powiat łosicki","ALS":"powiat łosicki",
+        "ZK":"Koszalin","ZSW":"Świnoujście","ZS":"Szczecin","ZZ":"Szczecin","ZBI":"powiat białogardzki",
+        "ZCH":"powiat choszczeński","ZDR":"powiat drawski","ZGL":"powiat goleniowski","ZGY":"powiat gryficki",
+        "ZGR":"powiat gryfiński","ZKA":"powiat kamieński","ZKO":"powiat koszaliński","ZKL":"powiat kołobrzeski",
+        "ZMY":"powiat myśliborski","ZPL":"powiat policki","ZPY":"powiat pyrzycki","ZST":"powiat stargardzki",
+        "ZSD":"powiat świdwiński","ZSZ":"powiat szczecinecki","ZSL":"powiat sławieński","ZWA":"powiat wałecki",
+        "ZLO":"powiat łobeski"}
+
+        numer_tablicy = self.entry.get().upper() 
+        
+        if numer_tablicy.startswith("W") and numer_tablicy[1:].isdigit() and len(numer_tablicy) == 7:
+            kraj_numer = numer_tablicy[1:4]
+            stanowisko_numer = int(numer_tablicy[4:])
+            
+            kraj = tablice_dyplomatyczne_kraj.get(kraj_numer, "Nieznany kraj")
+            
+            for key_range, description in tablice_dyplomatyczne_funkcja.items():
+                if key_range[0] <= stanowisko_numer <= key_range[1]:
+                    stanowisko = description
+                    break
+            else:
+                stanowisko = "Nieznane stanowisko"
+            
+            self.result_label.config(text=f"Tablica dyplomatyczna:\nKraj: {kraj}\n{stanowisko}")
+        
+        elif numer_tablicy.startswith("WW") or numer_tablicy.startswith("AW"):
+            rembertow = ["A", "C", "E", "X", "Y"]
+            wilanow = ["F","G","H","J","W"]
+            wlochy = ["K","L","M","N","V"]
+            if numer_tablicy[-1] in rembertow:
+                self.result_label.config(text=f"Przynależność: Warszawa Rembertów")
+            elif numer_tablicy[-1] in wilanow:
+                self.result_label.config(text=f"Przynależność: Warszawa Wilanów")
+            elif numer_tablicy[-1] in wlochy:
+                self.result_label.config(text=f"Przynależność: Warszawa Włochy")
+
+        elif numer_tablicy.startswith("WX") or numer_tablicy.startswith("AX"):
+            if numer_tablicy.endswith("YV") or numer_tablicy.endswith("YZ") or numer_tablicy[-2] == "Y":
+                self.result_label.config(text=f"Przynależność: Warszawa Wesoła")
+            else:
+                self.result_label.config(text=f"Przynależność: Warszawa Żoliborz")
+        elif numer_tablicy.startswith("WY") or numer_tablicy.startswith("AY"):
+            if numer_tablicy[-1] == "Y":
+                self.result_label.config(text=f"Samochód służbowy warszawskiego urzędu miasta\n lub pojazd cudzoziemca zameldowanego w stolicy.")
+                if numer_tablicy[-2:] == "YY":
+                    self.result_label.config(text=f"Przynależność: Sulejówek")
+            else:
+                self.result_label.config(text=f"Przynależność: Warszawa Wola")
+                
+        elif numer_tablicy[:1].isalpha() and numer_tablicy[1].isdigit():
+            znaki = numer_tablicy[:1]
+            if znaki in tablice_wojewodztwa:
+                self.result_label.config(text=f"Województwo {tablice_wojewodztwa[znaki]},\n tablica indywidualna")
+            else:
+                self.result_label.config(text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
+                
+        elif numer_tablicy[:3].isalpha():
+            znaki = numer_tablicy[:3]
+            wojewodztwo = numer_tablicy[:1]
+            if znaki in polskie_tablice_rejestracyjne:
+                if wojewodztwo in tablice_wojewodztwa:
+                    self.result_label.config(text=f"Przynależność: {polskie_tablice_rejestracyjne[znaki]},\n województwo {tablice_wojewodztwa[wojewodztwo]}")
+                else:
+                    self.result_label.config(text=f"Przynależność: {polskie_tablice_rejestracyjne[znaki]}")
+
+            else:
+                self.result_label.config(text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
+        
+        elif numer_tablicy[:2].isalpha():
+            znaki = numer_tablicy[:2]
+            wojewodztwo = numer_tablicy[:1]
+            if znaki in polskie_tablice_rejestracyjne:
+                if wojewodztwo in tablice_wojewodztwa:
+                    self.result_label.config(text=f"Przynależność: {polskie_tablice_rejestracyjne[znaki]},\n województwo {tablice_wojewodztwa[wojewodztwo]}")
+                else:
+                    self.result_label.config(text=f"Przynależność: {polskie_tablice_rejestracyjne[znaki]}")
+            else:
+                self.result_label.config(text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
+        
+        else:
+            self.result_label.config(text="Nieznany format numeru tablicy.")  
+        
+    def show_page(self, page):
+        if self.current_page:
+            self.current_page.grid_forget()
+        page.grid(row=0, column=0, sticky="nsew")
+        self.current_page = page
+        
+    def on_close_window(self):
+        self.back_to_menu()
+
+    def back_to_menu(self):
+        self.menu_app.show_menu()
+        self.destroy()
 
 
 class DietyKrajowe(tk.Toplevel):
@@ -2473,16 +2787,9 @@ Planer podrozy:
 - o czym trzeba pameitac w danym kraju
 
 Kody QR:
-- opis dokladnie opcje wyboru
-- zmienic napis przy pomyslnym wygenerowaniu kodu
-- https://informatykzakladowy.pl/wiecej-niz-chcieliscie-wiedziec-o-qr-kodach/
-- dodac przycisk powrotu do menu
-- zmienic pack na grid
-
+- 
 
 Tablice rejestracyjne:
-- zwykle, 
-- dyplomatyczne, 
-- nieoznakowane radiowozy
+- 
 
 """
