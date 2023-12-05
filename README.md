@@ -1,7 +1,7 @@
 # b130n
 Kombajn do pracy biurowej
 
-b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, planer podróży, generator kodów QR oraz tablice rejestracyjne.
+b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, odczyt pogody ze stacji IMGW, generator kodów QR oraz tablice rejestracyjne.
 
 ## Funkcje
 
@@ -11,11 +11,11 @@ Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajo
 
 ### Generator Haseł
 
-Nigdy więcej nie martw się o bezpieczeństwo swoich haseł. Generator haseł pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby.
+Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby.
 
 ### Generator PESEL
 
-b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość.
+b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu oraz adres e-mail).
 
 ### Transliteracja z Rosyjskiego
 
@@ -25,15 +25,15 @@ Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, 
 
 Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.
 
-### Kody QR (W BUDOWIE)
+### Kody QR
 
-Generowanie kodów QR.
+Możesz wygenerować kod QR w formie pliku graficznego kryjący w sobie dowolny tekst.
 
-### Planer podróży (W BUDOWIE)
+### Pogoda z IMGW
 
-Planowanie podróży.
+Możesz odczytywać różne dane pogodowe z poszczególnych stacji prowadzonych przez IMGW.
 
-### Tablice rejestracyjne (W BUDOWIE)
+### Tablice rejestracyjne
 
 Rozkodowywanie tablic rejestracyjnych w Polsce (policyjne, wojskowe, innych służb, dyplomatyczne, poszczególne powiaty).
 
