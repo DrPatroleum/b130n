@@ -14,6 +14,7 @@ import secrets
 import string
 import time
 import qrcode
+import pywintypes
 from tkinter import filedialog
 import os
 
@@ -69,14 +70,15 @@ options = ["dolar amerykański [USD]", "dolar australijski [AUD]", "dolar kanady
 class MenuApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("B130N")
+        self.title("B130N by Śliwka")
+         
         self.button1 = tk.Button(
             self, text="DIETY\n KRAJOWE", command=self.open_diety_krajowe, width=15, height=5)
-        self.button1.grid(row=0, column=0, padx=2, pady=2)
+        self.button1.grid(row=1, column=0, padx=2, pady=2)
 
         self.button2 = tk.Button(self, text="DIETY\n ZAGRANICZNE",
                                  command=self.open_diety_zagraniczne, width=15, height=5)
-        self.button2.grid(row=0, column=1, padx=2, pady=2)
+        self.button2.grid(row=1, column=2, padx=2, pady=2)
 
         self.button3 = tk.Button(
             self, text="PESEL", command=self.open_pesel, width=15, height=5)
@@ -84,23 +86,21 @@ class MenuApp(tk.Tk):
 
         self.button4 = tk.Button(self, text="KALKULATOR\n WALUT",
                                  command=self.open_kalkulator_walut, width=15, height=5)
-        self.button4.grid(row=1, column=0, padx=2, pady=2)
+        self.button4.grid(row=0, column=0, padx=2, pady=2)
 
         self.button5 = tk.Button(self, text="GENERATOR\n HASEŁ",
                                  command=self.open_generator_hasel, width=15, height=5)
-        self.button5.grid(row=1, column=1, padx=2, pady=2)
+        self.button5.grid(row=2, column=1, padx=2, pady=2)
 
-        self.button6 = tk.Button(
-            self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
-        self.button6.grid(row=1, column=2, padx=2, pady=2)
+        self.button6 = tk.Button(self, text="TRANSLITERACJA", command=self.open_transliteracja, width=15, height=5)
+        self.button6.grid(row=0, column=1, padx=2, pady=2)
 
         self.button7 = tk.Button(self, text="KODY QR",
                                  command=self.open_kodyqr, width=15, height=5)
         self.button7.grid(row=2, column=0, padx=2, pady=2)
-
-        self.button8 = tk.Button(self, text="PLANER PODRÓŻY",
-                                 command=self.open_planer, width=15, height=5)
-        self.button8.grid(row=2, column=1, padx=2, pady=2)
+        
+        self.button8 = tk.Button(self, text="POGODA IMGW", command=self.open_pogoda, width=15, height=5)
+        self.button8.grid(row=1, column=1, padx=2, pady=2)
 
         self.button9 = tk.Button(
             self, text="TABLICE\n REJESTRACYJNE", command=self.open_tablice, width=15, height=5)
@@ -163,12 +163,12 @@ class MenuApp(tk.Tk):
         app7 = KodyQR(self)
         app7.grid()
         self.current_app = app7
-
-    def open_planer(self):
+    
+    def open_pogoda(self):
         self.hide_menu()
         if self.current_app:
             self.current_app.destroy()
-        app8 = Planer(self)
+        app8 = Pogoda(self)
         app8.grid()
         self.current_app = app8
 
@@ -185,6 +185,120 @@ class MenuApp(tk.Tk):
 
     def show_menu(self):
         self.deiconify()
+        
+class Pogoda(tk.Toplevel):  
+    def __init__(self, menu_app):
+        super().__init__()
+        self.menu_app = menu_app
+        self.title("POGODA IMGW")
+        self.protocol("WM_DELETE_WINDOW", self.on_close_window)
+        self.current_page = None
+        self.strona_pierwsza()
+
+        self.show_page(self.page1)
+        
+    def strona_pierwsza(self):
+        self.miasta = {"Białystok": 12295, "Bielsko Biała": 12600, "Chojnice": 12235, "Częstochowa": 12550, "Elbląg": 12160, "Gdańsk": 12155, "Gorzów": 12300,
+          "Hel": 12135, "Jelenia Góra": 12500, "Kalisz": 12435, "Kasprowy Wierch": 12650, "Katowice": 12560, "Kętrzyn": 12185, "Kielce": 12570, "Kłodzko": 12520,
+          "Koło": 12345, "Kołobrzeg": 12100, "Koszalin": 12105, "Kozienice": 12488, "Kraków": 12566, "Krosno": 12670, "Legnica": 12415, "Lesko": 12690, "Leszno": 12418,
+          "Lębork": 12125, "Lublin": 12495, "Łeba": 12120, "Łódź": 12465, "Mikołajki": 12280, "Mława": 12270, "Nowy Sącz": 12660, "Olsztyn": 12272, "Opole": 12530,
+          "Ostrołęka": 12285, "Piła": 12230, "Platforma Baltic Beta": 12001, "Płock": 12360, "Poznań": 12330, "Przemyśl": 12695, "Racibórz": 12540, "Resko": 12210,
+          "Rzeszów": 12580, "Sandomierz": 12585, "Siedlce": 12385, "Słubice": 12310, "Sulejów": 12469, "Suwałki": 12195, "Szczecin": 12205, "Szczecinek": 12215,
+          "Śnieżka": 12510, "Świnoujście": 12200, "Tarnów": 12575, "Terespol": 12399, "Toruń": 12250, "Ustka": 12115, "Warszawa": 12375, "Wieluń": 12455, "Włodawa": 12497,
+          "Wrocław": 12424, "Zakopane": 12625, "Zamość": 12595, "Zielona Góra": 12400}
+
+        self.opcje_miast = sorted(self.miasta.keys())
+
+        self.sila_wiatru = {"cisza": (0, 0.2), "powiew": (0.2, 1.5), "słaby wiatr": (1.6, 3.3), "łagodny wiatr": (3.4, 5.4), "umiarkowany wiatr": (5.5, 7.9), "dość silny wiatr": (8, 10.7),
+                "silny wiatr": (10.8, 13.8), "bardzo silny wiatr": (13.9, 17.1), "sztorm": (17.2, 20.7), "silny sztorm": (20.8, 24.4), "bardzo silny sztorm": (24.5, 28.4),
+                "gwałtowny sztorm": (28.5, 32.6), "huragan": (32.7, 100)}
+        self.kierunki = {"północny": (337.6, 22.5), "północno-wschodni": (22.6, 67.5), "wschodni": (67.6, 112.5), "południowo-wschodni": (112.6, 157.5),
+                "południowy": (157.6, 202.5), "południowo-zachodni": (202.6, 247.5), "zachodni": (247.6, 292.5), "północno-zachodni": (292.6, 337.5)}
+ 
+        self.page1 = tk.Frame(self)
+        self.top_frame = Frame(self.page1)
+        self.top_frame.grid(row=0, column=0, sticky="nsew", padx=10,  pady=10)
+
+        self.label_start = Label(self.top_frame, text="Warunki atmosferyczne\n dla wybranej stacji pomiarowej IMGW")
+        self.label_start.grid(row=1, column=0, padx=5, pady=5, sticky=EW, columnspan=3)
+
+        self.option_var = StringVar(self.top_frame)
+        self.max_length = max(len(option) for option in self.opcje_miast)
+
+        self.option_menu = OptionMenu(self.top_frame, self.option_var, *self.opcje_miast)
+        self.option_menu.grid(row=2, column=1, sticky=NS)
+        self.option_menu.config(width=self.max_length + 2)
+        self.option_var.set("Wybierz lokalizację")
+
+        self.button = Button(self.top_frame, text='POKAŻ', command=self.pokaz_pogode)
+        self.button.grid(row=2, column=2, sticky=NS, padx=5, pady=5)
+
+        self.label1 = Label(self.top_frame)
+        self.label1.grid(row=3, column=0, sticky=NS, columnspan=2)
+        
+        self.back_button = tk.Button(
+        self.page1, text="POWRÓT DO MENU", command=self.back_to_menu, compound="right")
+        self.back_button.grid(row=4, column=0, sticky=NS, columnspan=2, padx=5, pady=5)
+        
+    def pokaz_pogode(self):
+        miasto = str(self.option_var.get())
+        id_stacji = self.miasta[miasto]
+
+        link = ("https://danepubliczne.imgw.pl/api/data/synop/id/xyz")
+        link_test = (
+            "https://danepubliczne.imgw.pl/api/data/synop/station/warszawa")
+        response = requests.get(link_test)
+
+        if response.status_code == 200:
+            req = requests.get(link.replace("xyz", str(id_stacji)))
+            json_data = req.text
+            data = json.loads(json_data)
+
+            stacja = data["stacja"]
+            data_pomiaru = data["data_pomiaru"]
+            godzina_pomiaru = data["godzina_pomiaru"]
+            temperatura = data["temperatura"]
+            predkosc_wiatru = data["predkosc_wiatru"]
+            kierunek_wiatru = data["kierunek_wiatru"]
+            wilgotnosc_wzgledna = data["wilgotnosc_wzgledna"]
+            suma_opadu = data["suma_opadu"]
+            cisnienie = data["cisnienie"]
+            
+            for zwrot, (min_wartosc, max_wartosc) in self.sila_wiatru.items():
+                if min_wartosc <= int(predkosc_wiatru) <= max_wartosc:
+                    x = zwrot
+            
+            for kierunek, (min_wartosc, max_wartosc) in self.kierunki.items():
+                if min_wartosc <= int(kierunek_wiatru) <= max_wartosc:
+                    y = kierunek
+
+            info = (f"""
+                    Pomiar z dnia {data_pomiaru} 
+                    z godz. {godzina_pomiaru}:00 ze stacji {stacja}
+                    Temperatura powietrza {temperatura} ℃
+                    Wiatr o prędkości {predkosc_wiatru} m/s 
+                    ({y} {x})
+                    Wilgotność powietrza: {wilgotnosc_wzgledna}%
+                    Suma opadów: {suma_opadu} mm
+                    Ciśnienie atmosferyczne: {cisnienie} hPa
+                    """)
+            self.label1.config(text=info)
+        else:
+            info = (f"Wystąpił problem z połączeniem z Internetem!")
+            self.label1.config(text=info)
+
+    def show_page(self, page):
+        if self.current_page:
+            self.current_page.grid_forget()
+        page.grid(row=0, column=0, sticky="nsew")
+        self.current_page = page
+        
+    def on_close_window(self):
+        self.back_to_menu()
+
+    def back_to_menu(self):
+        self.menu_app.show_menu()
+        self.destroy()
 
 
 class KodyQR(tk.Toplevel):
@@ -223,13 +337,13 @@ class KodyQR(tk.Toplevel):
         self.border_option_menu.grid(row=3, column=1)
 
         self.browse_button = Button(self.page1, text="GDZIE ZAPISAĆ PLIK?", command=self.browse_folder)
-        self.browse_button.grid(row=4, column=0, columnspan=2)
+        self.browse_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
         self.generate_button = Button(self.page1, text="GENERUJ QR", command=self.generate_qr, state=DISABLED)
-        self.generate_button.grid(row=5, column=0, sticky=EW)
+        self.generate_button.grid(row=5, column=0, sticky=EW, padx=5, pady=5)
         
         self.back_button = Button(self.page1, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=5, column=1, sticky=EW)
+        self.back_button.grid(row=5, column=1, sticky=EW, padx=5, pady=5)
 
         self.result_label = Label(self.page1)
         self.result_label.grid(row=6, column=0, columnspan=2)
@@ -303,17 +417,6 @@ class KodyQR(tk.Toplevel):
     def back_to_menu(self):
         self.menu_app.show_menu()
         self.destroy()
-
-class Planer(tk.Toplevel):
-    """wybor miejsca startu (domyslnie warszawa) i miejsca docelowego,
-    wybor srodka transportu
-    przeliczanie liczby kilometrow podrozy
-    wybor czasu pobytu w danym miejscu
-    co trzeba miec ze soba, jakie dokumenty
-    ile potrzebujesz pieniedzy
-    ile orientacyjnie moze kosztowac podroz
-    """
-    pass
 
 
 class Tablice(tk.Toplevel):
@@ -578,17 +681,6 @@ class Tablice(tk.Toplevel):
             
             self.result_label.config(text=f"Tablica dyplomatyczna:\nKraj: {kraj}\n{stanowisko}")
         
-        elif numer_tablicy.startswith("WW") or numer_tablicy.startswith("AW"):
-            rembertow = ["A", "C", "E", "X", "Y"]
-            wilanow = ["F","G","H","J","W"]
-            wlochy = ["K","L","M","N","V"]
-            if numer_tablicy[-1] in rembertow:
-                self.result_label.config(text=f"Przynależność: Warszawa Rembertów")
-            elif numer_tablicy[-1] in wilanow:
-                self.result_label.config(text=f"Przynależność: Warszawa Wilanów")
-            elif numer_tablicy[-1] in wlochy:
-                self.result_label.config(text=f"Przynależność: Warszawa Włochy")
-
         elif numer_tablicy.startswith("WX") or numer_tablicy.startswith("AX"):
             if numer_tablicy.endswith("YV") or numer_tablicy.endswith("YZ") or numer_tablicy[-2] == "Y":
                 self.result_label.config(text=f"Przynależność: Warszawa Wesoła")
@@ -621,6 +713,17 @@ class Tablice(tk.Toplevel):
             else:
                 self.result_label.config(text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
         
+        elif numer_tablicy.startswith("WW") or numer_tablicy.startswith("AW") and numer_tablicy[1].isdigit():
+            rembertow = ["A", "C", "E", "X", "Y"]
+            wilanow = ["F","G","H","J","W"]
+            wlochy = ["K","L","M","N","V"]
+            if numer_tablicy[-1] in rembertow:
+                self.result_label.config(text=f"Przynależność: Warszawa Rembertów")
+            elif numer_tablicy[-1] in wilanow:
+                self.result_label.config(text=f"Przynależność: Warszawa Wilanów")
+            elif numer_tablicy[-1] in wlochy:
+                self.result_label.config(text=f"Przynależność: Warszawa Włochy")
+                
         elif numer_tablicy[:2].isalpha():
             znaki = numer_tablicy[:2]
             wojewodztwo = numer_tablicy[:1]
@@ -697,11 +800,11 @@ class DietyKrajowe(tk.Toplevel):
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=0)
+        self.back_button.grid(row=0, column=0, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             button_container, text="DALEJ", command=self.next_page1)
-        self.button_next_page2.grid(row=0, column=1)
+        self.button_next_page2.grid(row=0, column=1, padx=5, pady=5)
 
     def strona_druga(self):
         self.page2 = tk.Frame(self)
@@ -737,15 +840,15 @@ class DietyKrajowe(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             button_container, text="WSTECZ", command=self.back_page2)
-        self.button_back_page2.grid(row=0, column=0)
+        self.button_back_page2.grid(row=0, column=0, padx=5, pady=5)
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             button_container, text="DALEJ", command=self.next_page2)
-        self.button_next_page2.grid(row=0, column=2, columnspan=2)
+        self.button_next_page2.grid(row=0, column=2, columnspan=2, padx=5, pady=5)
 
     def strona_trzecia(self):
         self.page3 = tk.Frame(self)
@@ -813,15 +916,15 @@ class DietyKrajowe(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             self.button_container, text="WSTECZ", command=self.back_page3)
-        self.button_back_page2.grid(row=0, column=0, sticky=E)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
             self.button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             self.button_container, text="DALEJ", command=self.next_page3)
-        self.button_next_page2.grid(row=0, column=2, sticky=W)
+        self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
 
     def strona_czwarta(self):
         self.page4 = tk.Frame(self)
@@ -835,11 +938,11 @@ class DietyKrajowe(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             button_container, text="WSTECZ", command=self.back_page4)
-        self.button_back_page2.grid(row=0, column=0, sticky=E)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1, sticky=W)
+        self.back_button.grid(row=0, column=1, sticky=W, padx=5, pady=5)
 
     def rycz_nocleg(self):
         try:
@@ -1114,7 +1217,7 @@ class DietyKrajowe(tk.Toplevel):
 
     def next_page1(self):
         self.show_page(self.page2)
-
+        
     def back_page2(self):
         self.show_page(self.page1)
 
@@ -1218,15 +1321,15 @@ class DietyZagraniczne(tk.Toplevel):
 
         self.back_button = tk.Button(
             button_container, text="STAWKI DIET ZAGRANICZNYCH", command=self.stawki_diet_zagra)
-        self.back_button.grid(row=0, column=0, padx=10, columnspan=2)
+        self.back_button.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=1, column=0, sticky=E)
+        self.back_button.grid(row=1, column=0, sticky=E, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             button_container, text="DALEJ", command=self.next_page1)
-        self.button_next_page2.grid(row=1, column=1, sticky=W)
+        self.button_next_page2.grid(row=1, column=1, sticky=W, padx=5, pady=5)
 
     def strona_druga(self):
         self.page2 = tk.Frame(self)
@@ -1262,15 +1365,15 @@ class DietyZagraniczne(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             button_container, text="WSTECZ", command=self.back_page2)
-        self.button_back_page2.grid(row=0, column=0)
+        self.button_back_page2.grid(row=0, column=0, padx=5, pady=5)
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             button_container, text="DALEJ", command=self.next_page2)
-        self.button_next_page2.grid(row=0, column=2, columnspan=2)
+        self.button_next_page2.grid(row=0, column=2, columnspan=2, padx=5, pady=5)
 
     def strona_trzecia(self):
         self.page3 = tk.Frame(self)
@@ -1345,15 +1448,15 @@ class DietyZagraniczne(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             self.button_container, text="WSTECZ", command=self.back_page3)
-        self.button_back_page2.grid(row=0, column=0, sticky=E)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
             self.button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
 
         self.button_next_page2 = tk.Button(
             self.button_container, text="DALEJ", command=self.next_page3)
-        self.button_next_page2.grid(row=0, column=2, sticky=W)
+        self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
 
     def strona_czwarta(self):
         self.page4 = tk.Frame(self)
@@ -1366,11 +1469,11 @@ class DietyZagraniczne(tk.Toplevel):
 
         self.button_back_page2 = tk.Button(
             button_container, text="WSTECZ", command=self.back_page4)
-        self.button_back_page2.grid(row=0, column=0, sticky=E)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
             button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=1, sticky=W)
+        self.back_button.grid(row=0, column=1, sticky=W, padx=5, pady=5)
 
     def stawki_diet_zagra(self):
         self.window = Toplevel()
@@ -2034,9 +2137,9 @@ class PESEL(tk.Toplevel):
                           int(p5[-1]) + int(p6[-1]) + int(p7[-1]) + int(p8[-1]) + int(p9[-1]))
                 control_sum = 10 - int(sum[-1])
                 if control_sum == int(self.Enter1.get()[10]):
-                    result = "PESEL poprawny (zgadza się suma kontrolna)"
+                    result = "PESEL poprawny\n (zgadza się suma kontrolna)"
                 else:
-                    result = "PESEL niepoprawny (niewłaściwa suma kontrolna)"
+                    result = "PESEL niepoprawny\n (niewłaściwa suma kontrolna)"
                 self.dob_from_pesel()
                 self.sex_from_pesel()
                 final_result = result + "\n" + self.dob_confirm + "\n" + self.sex + "\n"
@@ -2579,25 +2682,25 @@ class GeneratorHasel(tk.Toplevel):
         self.page1 = tk.Frame(self)
         self.label1 = Label(self.page1,
                             text="Z jakich znaków ma składać się hasło?")
-        self.label1.pack()
+        self.label1.grid(row=0, column=0, columnspan=2)
 
         self.check_numbers = IntVar()
         self.check_button_numbers = Checkbutton(self.page1,
                                                 text="Liczby",
                                                 variable=self.check_numbers)
-        self.check_button_numbers.pack()
+        self.check_button_numbers.grid(row=1, column=0, columnspan=2)
 
         self.check_letters = IntVar()
         self.check_button_letters = Checkbutton(self.page1,
                                                 text="Litery",
                                                 variable=self.check_letters)
-        self.check_button_letters.pack()
+        self.check_button_letters.grid(row=2, column=0, columnspan=2)
 
         self.check_special_characters = IntVar()
         self.check_button_special = Checkbutton(self.page1,
                                                 text="Znaki specjalne",
                                                 variable=self.check_special_characters)
-        self.check_button_special.pack()
+        self.check_button_special.grid(row=3, column=0, columnspan=2)
 
         self.pass_len = IntVar()
         self.scale = Scale(self.page1,
@@ -2609,24 +2712,24 @@ class GeneratorHasel(tk.Toplevel):
                            showvalue=1,
                            resolution=1,
                            variable=self.pass_len)
-        self.scale.pack()
+        self.scale.grid(row=4, column=0, columnspan=2)
 
         self.gen_button = Button(self.page1,
                                  text="GENERUJ",
                                  command=self.click,
                                  state=ACTIVE,
                                  compound="left")
-        self.gen_button.pack()
+        self.gen_button.grid(row=5, column=0)
 
         self.back_button = tk.Button(
             self.page1, text="POWRÓT DO MENU", command=self.back_to_menu, compound="right")
-        self.back_button.pack()
+        self.back_button.grid(row=5, column=1)
 
         self.label2 = Label(self.page1)
-        self.label2.pack()
+        self.label2.grid(row=6, column=0, columnspan=2)
 
         self.label3 = Label(self.page1)
-        self.label3.pack()
+        self.label3.grid(row=7, column=0, columnspan=2)
 
     def click(self):
         if self.check_numbers.get() == 0 and self.check_letters.get() == 0 and self.check_special_characters.get() == 0:
@@ -2707,21 +2810,22 @@ class Transliteracja(tk.Toplevel):
         self.page1 = tk.Frame(self)
 
         self.input_label = tk.Label(
-            self.page1, text="Wprowadź tekst do transliteracji z cyrylicy na alfabet łaciński")
-        self.input_label.pack(padx=5, pady=5)
+            self.page1, text="Wprowadź tekst do transliteracji\n z języka rosyjskiego na alfabet łaciński")
+        self.input_label.grid(row=0, column=0, padx=5, pady=5, columnspan=2)
 
-        self.input_text = tk.Text(self.page1, height=4)
-        self.input_text.pack(padx=5, pady=5)
+        self.input_text = tk.Text(self.page1, height=4, width=50)
+        self.input_text.grid(row=1, column=0, padx=5, pady=5, columnspan=2)
 
         self.translate_button = tk.Button(
-            self.page1, text="Transliteruj", command=self.translate)
-        self.translate_button.pack(padx=5, pady=5)
+            self.page1, text="TRANSLITERACJA", command=self.translate)
+        self.translate_button.grid(row=2, column=0, padx=5, pady=5)
+        
+        self.back_button = tk.Button(
+        self.page1, text="POWRÓT DO MENU", command=self.back_to_menu, compound="right")
+        self.back_button.grid(row=2, column=1, padx=5, pady=5)
 
-        self.output_label = tk.Label(self.page1, text="Rezultat transliteracji")
-        self.output_label.pack(padx=5, pady=5)
-
-        self.output_text = tk.Text(self.page1, height=4)
-        self.output_text.pack(padx=5, pady=5)
+        self.output_text = tk.Text(self.page1, height=4, width=50)
+        self.output_text.grid(row=4, column=0, padx=5, pady=5, columnspan=2)
 
     def translate(self):
         self.all_chars_rus = {"Й": "Y", "Ц": "TS", "У": "U", "К": "K", "Е": "E", "Н": "N", "Г": "G", "Ш": "SH", "Ё": "E",
@@ -2760,36 +2864,3 @@ class Transliteracja(tk.Toplevel):
 if __name__ == "__main__":
     app = MenuApp()
     app.mainloop()
-
-
-"""
-Diety krajowe:
--
-
-Diety zagraniczne:
--
-
-PESEL:
--
-
-Kalkulator walut:
--
-
-Transliteracja:
-- 
- 
-Generator haseł:
--
-
-Planer podrozy:
-- czas dojazdu
-- potrzebne srodki finansowe
-- o czym trzeba pameitac w danym kraju
-
-Kody QR:
-- 
-
-Tablice rejestracyjne:
-- 
-
-"""
