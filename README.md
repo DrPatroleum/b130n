@@ -7,7 +7,7 @@ b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, kt
 
 ### Kalkulator Diet
 
-Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajową, jak i zagraniczną.
+Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajową, jak i zagraniczną. W najnowszej wersji dodano obsługę błędów.
 
 ### Generator Haseł
 
@@ -15,15 +15,15 @@ Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania.
 
 ### Generator PESEL
 
-b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu oraz adres e-mail).
+b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu oraz adres e-mail). W najnowszej wersji dodano obsługę błędów i poprawiono znalezione błędy.
 
 ### Transliteracja z Rosyjskiego
 
-Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, b130n ma gotowe narzędzie do transliteracji, które ułatwia ten proces.
+Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, b130n ma gotowe narzędzie do transliteracji, które ułatwia ten proces. W najnowszej wersji dodano transliteracji z języka ukraińskiego i białoruskiego, a przy tym dodano klawiatury ekranowe dla każdego z języków.
 
 ### Kalkulator Walut
 
-Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.
+Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.W najnowszej wersji dodano obsługę błędów.
 
 ### Kody QR
 
@@ -31,7 +31,7 @@ Możesz wygenerować kod QR w formie pliku graficznego kryjący w sobie dowolny 
 
 ### Pogoda z IMGW
 
-Możesz odczytywać różne dane pogodowe z poszczególnych stacji prowadzonych przez IMGW.
+Możesz odczytywać różne dane pogodowe z poszczególnych stacji prowadzonych przez IMGW. W najnowszej wersji dodano kilka ulepszeń.
 
 ### Tablice rejestracyjne
 
