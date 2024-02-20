@@ -1280,7 +1280,7 @@ class DietyKrajowe(tk.Toplevel):
             godziny_startu = int(self.wybor_godziny_startu.get())
             minuty_startu = int(self.wybor_minuty_startu.get())
             
-            if not (godziny_startu < 23) or not (minuty_startu < 59):
+            if not (godziny_startu <= 23) or not (minuty_startu <= 59):
                 messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page2)
@@ -1295,7 +1295,7 @@ class DietyKrajowe(tk.Toplevel):
             godziny_konca = int(self.wybor_godziny_konca.get())
             minuty_konca = int(self.wybor_minuty_konca.get())
             
-            if not (godziny_konca < 23) or not (minuty_konca < 59):
+            if not (godziny_konca <= 23) or not (minuty_konca <= 59):
                 messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page3)
@@ -1796,7 +1796,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.nocleg_var1.get():
             self.ryczalt_nocleg
             ryc_noc_info = (
-                f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} PLN.")
+                f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} {omega}.")
         else:
             self.ryczalt_nocleg = 0
             ryc_noc_info = ("")
@@ -1804,7 +1804,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.auto_var2.get():
             self.ryczalt_auto
             ryc_auto_info = (
-                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} PLN.")
+                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} {omega}.")
         else:
             self.ryczalt_auto = 0
             ryc_auto_info = ("")
@@ -1812,7 +1812,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
             ryc_kom_info = (
-                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} PLN.")
+                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} {omega}.")
         else:
             self.ryczalt_komunikacja = 0
             ryc_kom_info = ("")
@@ -1820,7 +1820,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.dojazd_do_var4.get():
             self.ryczalt_dojazd_do
             ryc_dojazd_do = (
-                f"Za ryczałt za dojazd do lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_do,2)} PLN.")
+                f"Za ryczałt za dojazd do lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_do,2)} {omega}.")
         else:
             self.ryczalt_dojazd_do = 0
             ryc_dojazd_do = ("")
@@ -1828,7 +1828,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.dojazd_z_var5.get():
             self.ryczalt_dojazd_z
             ryc_dojazd_z = (
-                f"Za ryczałt za dojazd z lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_z,2)} PLN.")
+                f"Za ryczałt za dojazd z lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_z,2)} {omega}.")
         else:
             self.ryczalt_dojazd_z = 0
             ryc_dojazd_z = ("")
@@ -1837,7 +1837,7 @@ class DietyZagraniczne(tk.Toplevel):
 
         if zarcie != 0:
             zarcie_info = (
-                f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.")
+                f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} {omega}.")
         else:
             zarcie_info = ("")
 
@@ -1915,7 +1915,7 @@ class DietyZagraniczne(tk.Toplevel):
             godziny_startu = int(self.zwybor_godziny_startu.get())
             minuty_startu = int(self.zwybor_minuty_startu.get())
             
-            if not (godziny_startu < 23) or not (minuty_startu < 59):
+            if not (godziny_startu <= 23) or not (minuty_startu <= 59):
                 messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page2)
@@ -1930,7 +1930,7 @@ class DietyZagraniczne(tk.Toplevel):
             godziny_konca = int(self.zwybor_godziny_konca.get())
             minuty_konca = int(self.zwybor_minuty_konca.get())
             
-            if not (godziny_konca < 23) or not (minuty_konca < 59):
+            if not (godziny_konca <= 23) or not (minuty_konca <= 59):
                 messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page3)
