@@ -11,19 +11,19 @@ Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajo
 
 ### Generator Haseł
 
-Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby.
+Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby. Program jest w stanie pokazać ile czasu zajmie złamanie hasła metodą słownikową i brute force.
 
 ### Generator PESEL
 
-b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu oraz adres e-mail). W najnowszej wersji dodano obsługę błędów i poprawiono znalezione błędy.
+b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu, adres e-mail oraz numer dowodu osobistego), także do pliku txt. W najnowszej wersji dodano obsługę błędów i poprawiono znalezione błędy.
 
-### Transliteracja z Rosyjskiego
+### Transliteracja z Rosyjskiego, Białoruskiego i Ukraińskiego
 
 Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, b130n ma gotowe narzędzie do transliteracji, które ułatwia ten proces. W najnowszej wersji dodano transliteracji z języka ukraińskiego i białoruskiego, a przy tym dodano klawiatury ekranowe dla każdego z języków.
 
 ### Kalkulator Walut
 
-Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym.W najnowszej wersji dodano obsługę błędów.
+Kalkulator walut w aplikacji b130n pozwala śledzić aktualne kursy wymiany walut. Możesz łatwo przeliczać kwoty między różnymi walutami i być na bieżąco z rynkiem walutowym. W najnowszej wersji dodano obsługę błędów.
 
 ### Kody QR
 
@@ -35,7 +35,7 @@ Możesz odczytywać różne dane pogodowe z poszczególnych stacji prowadzonych 
 
 ### Tablice rejestracyjne
 
-Rozkodowywanie tablic rejestracyjnych w Polsce (policyjne, wojskowe, innych służb, dyplomatyczne, poszczególne powiaty).
+Rozkodowywanie tablic rejestracyjnych w Polsce (policyjne, wojskowe, innych służb, dyplomatyczne, poszczególne powiaty). Dodano przyciski z tabelami pokazującymi jak zapisywane są numery rejestracyjne aut ałużbowych w Polsce.
 
 ## Technologie
 
