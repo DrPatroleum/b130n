@@ -16,6 +16,8 @@ import time
 import qrcode
 from tkinter import filedialog
 import os
+import math
+import psutil
 
 godziny = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
@@ -57,13 +59,243 @@ tabela_nbp = {"dolar amerykański [USD]": "USD", "dolar australijski [AUD]": "AU
               "forint [HUF]": "HUF", "frank szwajcarski [CHF]": "CHF", "funt szterling [GBP]": "GBP", "hrywna [UAH]": "UAH", "jen [JPY]": "JPY",
               "korona czeska [CZK]": "CZK", "korona duńska [DKK]": "DKK", "korona islandzka [ISK]": "ISK", "korona norweska [NOK]": "NOK",
               "korona szwedzka [SEK]": "SEK", "lej rumuński [RON]": "RON", "lira turecka [TRY]": "TRY", "szekel [ILS]": "ILS",
-              "dirham ZEA [AED]": "AED", "rubel białoruski [BYN]": "BYN", "rubel rosyjski [RUB]": "RUB"}
+              "dirham ZEA [AED]": "AED", "rubel białoruski [BYN]": "BYN", "rubel rosyjski [RUB]": "RUB", "bat tajski [THB]": "THB", "dolar nowozelandzki [NZD]": "NZD", 
+              "dolar singapurski [SGD]": "SGD", "lew bułgarski [BGN]": "BGN", "real brazylijski [BRL]": "BRL", "rupia indonezyjska [IDR]": "IDR", 
+              "rupia indyjska [INR]": "INR", "won południowokoreański [KRW]": "KRW", "juan renminbi [CNY]": "CNY", "dong wietnamski [VND]": "VND", "nowy dolar tajwański [TWD]": "TWD"}
 options = ["dolar amerykański [USD]", "dolar australijski [AUD]", "dolar kanadyjski [CAD]", "euro [EUR]",
            "forint [HUF]", "frank szwajcarski [CHF]", "funt szterling [GBP]", "hrywna [UAH]", "jen [JPY]",
            "korona czeska [CZK]", "korona duńska [DKK]", "korona islandzka [ISK]", "korona norweska [NOK]",
            "korona szwedzka [SEK]", "lej rumuński [RON]", "lira turecka [TRY]", "szekel [ILS]",
-           "dirham ZEA [AED]", "rubel białoruski [BYN]", "rubel rosyjski [RUB]"]
+           "dirham ZEA [AED]", "rubel białoruski [BYN]", "rubel rosyjski [RUB]", "bat tajski [THB]", "dolar nowozelandzki [NZD]",
+           "dolar singapurski [SGD]", "lew bułgarski [BGN]", "real brazylijski [BRL]", "rupia indonezyjska [IDR]",
+           "rupia indyjska [INR]","won południowokoreański [KRW]","juan renminbi [CNY]","dong wietnamski [VND]","nowy dolar tajwański [TWD]"]
+tablice_dyplomatyczne_kraj = {"001": "USA", "002": "Wielka Brytania", "003": "Francja", "004": "Kanada",
+                                      "005": "Niemcy", "006": "Holandia", "007": "Włochy", "008": "Austria", "009": "Japonia",
+                                      "010": "Turcja", "011": "Belgia", "012": "Dania", "013": "Norwegia", "014": "Grecja",
+                                      "015": "Australia", "016": "Algieria", "017": "Afganistan", "018": "Argentyna",
+                                      "019": "Brazylia", "020": "Bangladesz", "021": "Egipt", "022": "Ekwador", "023": "Finlandia",
+                                      "024": "Hiszpania", "025": "Irak", "026": "Iran", "027": "Indie", "028": "Indonezja",
+                                      "029": "Kolumbia", "030": "Malezja", "031": "Libia", "032": "Maroko", "033": "Meksyk",
+                                      "034": "Nigeria", "035": "Pakistan", "036": "Portugalia", "037": "Palestyna", "038": "Syria",
+                                      "039": "Szwecja", "040": "Szwajcaria", "041": "Tunezja", "042": "Tajlandia", "043": "Wenezuela",
+                                      "044": "Urugwaj", "045": "Peru", "046": "Jemen", "047": "Kostaryka", "048": "Kongo",
+                                      "049": "Izrael", "050": "Nikaragua", "051": "Chile", "052": "Watykan", "053": "Korea Południowa",
+                                      "054": "Przedstawicielstwo Komisji Wspólnot Europejskich", "055": "Irlandia", "056": "Bank Światowy",
+                                      "057": "Międzynarodowy Fundusz Walutowy", "058": "Filipiny", "059": "Międzynarodowa Korporacja Finansowa",
+                                      "060": "RPA", "061": "Biuro Instytucji Demokratycznych i Praw Człowieka OBWE", "062": "Cypr",
+                                      "063": "Kuwejt", "064": "Organizacja Narodów Zjednoczonych", "065": "Rosja", "066": "Słowacja",
+                                      "067": "Czechy", "068": "Bułgaria", "069": "Węgry", "070": "Rumunia", "071": "Wietnam",
+                                      "072": "Serbia", "073": "Korea Północna", "074": "Kuba", "075": "Albania", "076": "Chiny",
+                                      "077": "Mongolia", "078": "Międzynarodowa Organizacja Pracy", "079": "Organizacja Kooperacyjna ds. Kolei",
+                                      "080": "Klub Dyplomatyczny", "081": "Laos", "082": "Angola", "083": "Ukraina", "084": "Europejski Bank Odbudowy i Rozwoju",
+                                      "085": "Litwa", "086": "Białoruś", "087": "Łotwa", "088": "Chorwacja", "089": "Liban",
+                                      "090": "Słowenia", "091": "Gwatemala", "092": "Estonia", "093": "Macedonia", "094": "Mołdawia",
+                                      "095": "Izrael", "096": "Armenia", "097": "Sri Lanka", "098": "Kazachstan", "099": "Arabia Saudyjska",
+                                      "100": "Gruzja", "101": "Uzbekistan", "102": "UN-HABITAT", "103": "Nowa Zelandia", "104": "Azerbejdżan",
+                                      "105": "Suwerenny Wojskowy Zakon Maltański", "106": "Kambodża", "107": "Frontex", "108": "Luksemburg",
+                                      "109": "Bośnia i Hercegowina", "110": "Panama", "111": "Katar", "112": "Malta",
+                                      "113": "Zjednoczone Emiraty Arabskie", "114": "Czarnogóra", "115": "Senegal"}
+tablice_dyplomatyczne_funkcja = {(0, 199): "Prywatny pojazd personelu dyplomatycznego ambasady",
+                                    (200, 299): "Prywatny pojazd attaché wojskowego",
+                                    (300, 499): "Prywatny pojazd personelu niedyplomatycznego ambasady",
+                                    (500, 501): "Służbowy pojazd ambasadora",
+                                    (502, 699): "Służbowy pojazd ambasady",
+                                    (700, 799): "Prywatny pojazd personelu dyplomatycznego konsulatu generalnego",
+                                    (800, 899): "Prywatny pojazd personelu niedyplomatycznego konsulatu generalnego",
+                                    (900, 901): "Służbowy pojazd konsula generalnego",
+                                    (902, 999): "Służbowy pojazd konsulatu generalnego"}
 
+tablice_wojewodztwa = {"B": "podlaskie", "C": "kujawsko-pomorskie", "D": "dolnośląskie", "E": "łódzkie", "F": "lubuskie",
+                        "G": "pomorskie", "X": "pomorskie", "K": "małopolskie", "L": "lubelskie", "N": "warmińsko-mazurskie",
+                        "O": "opolskie", "P": "wielkopolskie", "R": "podkarpackie", "S": "śląskie", "T": "świętokrzyskie", "W": "mazowieckie",
+                        "Z": "zachodniopomorskie", "I": "śląskie", "J": "małopolskie", "M": "wielkopolskie", "Y": "podkarpackie",
+                        "V": "dolnośląskie", "A": "mazowieckie"}
+
+polskie_tablice_rejestracyjne = {"UA": "Siły zbrojne RP:\n samochód osobowy, osobowo-terenowy\n lub specjalny na podwoziu osobowym",
+                                    "UB": "Siły zbrojne RP:\n transporter opancerzony", "UC": "Siły zbrojne RP:\n samochód dostawczy",
+                                    "UD": "Siły zbrojne RP:\n autobus", "UE": "Siły zbrojne RP:\n samochód ciężarowy lub ciężarowo-terenowy\n o przeznaczeniu transportowym",
+                                    "UG": "Siły zbrojne RP:\n pojazd specjalny\n na podwoziu ciężarowym", "UI": "Siły zbrojne RP:\n przyczepa transportowa",
+                                    "UJ": "Siły zbrojne RP:\n przyczepa specjalna", "UK": "Siły zbrojne RP:\n motocykl", "HSB": "Kontrola skarbowa\n woj. podlaskie", "HSC": "Kontrola skarbowa\n woj. kujawsko-pomorskie", "HSD": "Kontrola skarbowa\n woj. dolnośląskie",
+                                    "HSE": "Kontrola skarbowa\n woj. łódzkie", "HSF": "Kontrola skarbowa\n woj. lubuskie",
+                                    "HSG": "Kontrola skarbowa\n woj. pomorskie", "HSK": "Kontrola skarbowa\n woj. małopolskie",
+                                    "HSL": "Kontrola skarbowa\n woj. lubelskie", "HSN": "Kontrola skarbowa\n woj. warmińsko-mazurskie",
+                                    "HSO": "Kontrola skarbowa\n woj. opolskie", "HSP": "Kontrola skarbowa\n woj. wielkopolskie",
+                                    "HSR": "Kontrola skarbowa\n woj. podkarpackie", "HSS": "Kontrola skarbowa\n woj. śląskie",
+                                    "HST": "Kontrola skarbowa\n woj. świętokrzyskie", "HSW": "Kontrola skarbowa\n woj. mazowieckie",
+                                    "HSZ": "Kontrola skarbowa\n woj. zachodniopomorskie", "HCA": "Służba celna Olsztyn",
+                                    "HCB": "Służba celna Białystok", "HCC": "Służba celna Biała Podlaska",
+                                    "HCD": "Służba celna Przemyśl", "HCE": "Służba celna Kraków", "HCF": "Służba celna Katowice",
+                                    "HCG": "Służba celna Wrocław", "HCH": "Służba celna Rzepin", "HCJ": "Służba celna Szczecin",
+                                    "HCK": "Służba celna Gdynia", "HCL": "Służba celna Warszawa", "HCM": "Służba celna Toruń",
+                                    "HCN": "Służba celna Łódź", "HCO": "Służba celna Poznań", "HCP": "Służba celna Opole",
+                                    "HCR": "Służba celna Kielce", "HPA": "Komenda Główna Policji", "HPB": "Policja woj. dolnośląskie",
+                                    "HPC": "Policja woj. kujawsko-pomorskie", "HPD": "Policja woj. lubelskie",
+                                    "HPE": "Policja woj. lubuskie", "HPF": "Policja woj. łódzkie", "HPG": "Policja woj. małopolskie",
+                                    "HPH": "Policja woj. mazowieckie", "HPJ": "Policja woj. opolskie", "HPK": "Policja woj. podkarpackie", "HPL": "Szkoła Policji w Szczytnie/Pile/Słupsku/Katowicach\n lub Centrum Szkolenia Policji w Legionowie",
+                                    "HPM": "Policja woj. podlaskie", "HPN": "Policja woj. pomorskie", "HPP": "Policja woj. śląskie",
+                                    "HPS": "Policja woj. świętokrzyskie", "HPT": "Policja woj. warmińsko-mazurskie",
+                                    "HPU": "Policja woj. wielkopolskie", "HPW": "Policja woj. zachodniopomorskie",
+                                    "HPZ": "Komenda Stołeczna Policji", "HA": "Centralne Biuro Antykorupcyjne",
+                                    "HB": "Służba Ochrony Państwa", "HK": "Agencja Bezpieczeństwa Wewnętrznego\n lub Agencja Wywiadu",
+                                    "HW": "Straż Graniczna", "HM": "Służba Wywiadu Wojskowego\n lub Służba Kontrwywiadu Wojskowego", "BI": "Białystok", "BS": "Suwałki", "BL": "Łomża", "BAU": "powiat augustowski",
+                                    "BIA": "powiat białostocki", "BBI": "powiat bielski", "BGR": "powiat grajewski", "BHA": "powiat hajnowski",
+                                    "BKL": "powiat kolneński", "BMN": "powiat moniecki", "BSE": "powiat sejneński", "BSI": "powiat siemiatycki",
+                                    "BSK": "powiat sokólski", "BSU": "powiat suwalski", "BWM": "powiat wysokomazowiecki", "BZA": "powiat zambrowski",
+                                    "BLM": "powiat łomżyński", "CB": "Bydgoszcz", "CG": "Grudziądz", "CT": "Toruń", "CW": "Włocławek", "CAL": "powiat aleksandrowski",
+                                    "CBR": "powiat brodnicki", "CBY": "powiat bydgoski", "CCH": "powiat chełmiński", "CGD": "powiat golubsko-dobrzyński",
+                                    "CGR": "powiat grudziądzki", "CIN": "powiat inowrocławski", "CLI": "powiat lipnowski", "CMG": "powiat mogileński",
+                                    "CNA": "powiat nakielski", "CRA": "powiat radziejowski", "CRY": "powiat rypiński", "CSE": "powiat sępoleński",
+                                    "CSW": "powiat świecki", "CTR": "powiat toruński", "CTU": "powiat tucholski", "CWA": "powiat wąbrzeski",
+                                    "CWL": "powiat włocławski", "CZN": "powiat żniński", "DJ": "Jelenia Góra", "VJ": "Jelenia Góra", "DL": "Legnica", "DB": "Wałbrzych", "VL": "Legnica", "VB": "Wałbrzych", "DW": "Wrocław", "DX": "Wrocław", "VW": "Wrocław", "VX": "Wrocław", "VBL": "powiat bolesławiecki",
+                                    "DBL": "powiat bolesławiecki", "VBL": "powiat bolesławiecki", "DDZ": "powiat dzierżoniowski", "VDZ": "powiat dzierżoniowski",
+                                    "DGR": "powiat górowski", "VGR": "powiat górowski", "DGL": "powiat głogowski", "VGL": "powiat głogowski",
+                                    "DGL": "powiat głogowski", "VGL": "powiat głogowski", "DJE": "powiat jeleniogórski", "VJE": "powiat jeleniogórski",
+                                    "DKA": "powiat kamiennogórski", "VKA": "powiat kamiennogórski", "DKL": "powiat kłodzki", "VKL": "powiat kłodzki",
+                                    "DLE": "powiat legnicki", "VLE": "powiat legnicki", "DLB": "powiat lubański", "VLB": "powiat lubański",
+                                    "DLU": "powiat lubiński", "VLU": "powiat lubiński", "DLW": "powiat lwówecki", "VLW": "powiat lwówecki",
+                                    "DMI": "powiat milicki", "VMI": "powiat milicki", "DOL": "powiat oleśnicki", "VOL": "powiat oleśnicki",
+                                    "DOA": "powiat oławski", "VOA": "powiat oławski", "DPL": "powiat polkowicki", "VPL": "powiat polkowicki",
+                                    "DSR": "powiat średzki", "VSR": "powiat średzki", "DST": "powiat strzeliński", "VST": "powiat strzeliński",
+                                    "DSW": "powiat świdnicki", "VSW": "powiat świdnicki", "DTR": "powiat trzebnicki", "VTR": "powiat trzebnicki",
+                                    "DBA": "powiat wałbrzyski", "VBA": "powiat wałbrzyski", "DWL": "powiat wołowski", "VWL": "powiat wołowski",
+                                    "DWR": "powiat wrocławski", "VWR": "powiat wrocławski", "DZA": "powiat ząbkowicki", "VZA": "powiat ząbkowicki",
+                                    "DZG": "powiat zgorzelecki", "VZG": "powiat zgorzelecki", "DZL": "powiat złotoryjski", "VZL": "powiat złotoryjski", "ED": "Łódź",
+                                    "EP": "Piotrków Trybunalski", "ES": "Skierniewice", "EL": "Łódź", "EBE": "powiat bełchatowski", "EBR": "powiat brzeziński", "EKU": "powiat kutnowski", "EOP": "powiat opoczyński", "EPA": "powiat pabianicki", "EPJ": "powiat pajęczański", "EPI": "powiat piotrkowski",
+                                    "EPD": "powiat poddębicki", "ERA": "powiat radomszczański", "ERW": "powiat rawski", "ESI": "powiat sieradzki",
+                                    "ESK": "powiat skierniewicki", "ETM": "powiat tomaszowski", "EWI": "powiat wieluński", "EWE": "powiat wieruszowski",
+                                    "EZD": "powiat zduńskowolski", "EZG": "powiat zgierski", "ELA": "powiat łaski", "ELE": "powiat łęczycki",
+                                    "ELW": "powiat łódzki wschodni", "ELC": "powiat łowicki", "FG": "Gorzów Wielkopolski", "FZ": "Zielona Góra",
+                                    "FGW": "powiat gorzowski", "FKR": "powiat krośnieński", "FMI": "powiat międzyrzecki", "FNW": "powiat nowosolski",
+                                    "FSD": "powiat strzelecko-drezdenecki", "FSU": "powiat sulęciński", "FSW": "powiat świebodziński",
+                                    "FSL": "powiat słubicki", "FWS": "powiat wschowski", "FZG": "powiat żagański", "FZA": "powiat żarski",
+                                    "FZI": "powiat zielonogórski", "GD": "Gdańsk", "XD": "Gdańsk", "GA": "Gdynia", "XA": "Gdynia",
+                                    "GSP": "Sopot", "XSP": "Sopot", "GS": "Słupsk", "XS": "Słupsk", "GBY": "powiat bytowski", "XBY": "powiat bytowski",
+                                    "GCH": "powiat chojnicki", "XCH": "powiat chojnicki", "GCZ": "powiat człuchowski", "XCZ": "powiat człuchowski",
+                                    "GDA": "powiat gdański", "XDA": "powiat gdański", "GKA": "powiat kartuski", "GKY": "powiat kartuski", "GKZ": "powiat kartuski",
+                                    "XKA": "powiat kartuski", "XKY": "powiat kartuski", "XKZ": "powiat kartuski", "GKS": "powiat kościerski", "XKS": "powiat kościerski",
+                                    "GKW": "powiat kwidzyński", "XKW": "powiat kwidzyński", "GLE": "powiat lęborski", "XLE": "powiat lęborski",
+                                    "GMB": "powiat malborski", "XMB": "powiat malborski", "GND": "powiat nowodworski", "XND": "powiat nowodworski",
+                                    "GPU": "powiat pucki", "XPU": "powiat pucki", "GST": "powiat starogardzki", "XST": "powiat starogardzki",
+                                    "GSZ": "powiat sztumski", "XSZ": "powiat sztumski", "GSL": "powiat słupski", "XSL": "powiat słupski",
+                                    "GTC": "powiat tczewski", "XTC": "powiat tczewski", "GWE": "powiat wejherowski", "GWO": "powiat wejherowski",
+                                    "XWE": "powiat wejherowski", "XWO": "powiat wejherowski", "KK": "Kraków", "KR": "Kraków", "JK": "Kraków", "JR": "Kraków",
+                                    "KN": "Nowy Sącz", "JN": "Nowy Sącz", "KT": "Tarnów", "JT": "Tarnów", "KBC": "powiat bocheński", "JBC": "powiat bocheński",
+                                    "KBA": "powiat bocheński", "JBA": "powiat bocheński", "KBR": "powiat brzeski", "JBR": "powiat brzeski",
+                                    "KCH": "powiat chrzanowski", "JCH": "powiat chrzanowski", "KDA": "powiat dąbrowski", "JDA": "powiat dąbrowski",
+                                    "KGR": "powiat gorlicki", "JGR": "powiat gorlicki", "KRA": "powiat krakowski", "JRA": "powiat krakowski",
+                                    "KLI": "powiat limanowski", "JLI": "powiat limanowski", "KMI": "powiat miechowski", "JMI": "powiat miechowski",
+                                    "KMY": "powiat myślenicki", "JMY": "powiat myślenicki", "KNS": "powiat nowosądecki", "JNS": "powiat nowosądecki",
+                                    "KNT": "powiat nowotarski", "JNT": "powiat nowotarski", "KOL": "powiat olkuski", "JOL": "powiat olkuski",
+                                    "KOS": "powiat oświęcimski", "JOS": "powiat oświęcimski", "KPR": "powiat proszowicki", "JPR": "powiat proszowicki",
+                                    "KSU": "powiat suski", "JSU": "powiat suski", "KTA": "powiat tarnowski", "JTA": "powiat tarnowski",
+                                    "KTT": "powiat tatrzański", "JTT": "powiat tatrzański", "KWA": "powiat wadowicki", "JWA": "powiat wadowicki",
+                                    "KWI": "powiat wielicki", "JWI": "powiat wielicki", "LB": "Biała Podlaska", "LC": "Chełm", "LU": "Lublin", "LZ": "Zamość", "LBI": "powiat bialski", "LBL": "powiat biłgorajski", "LCH": "powiat chełmski", "LHR": "powiat hrubieszowski", "LJA": "powiat janowski", "LKR": "powiat kraśnicki",
+                                    "LKS": "powiat krasnostawski", "LLB": "powiat lubartowski", "LUB": "powiat lubelski", "LOP": "powiat opolski",
+                                    "LPA": "powiat parczewski", "LPU": "powiat puławski", "LRA": "powiat radzyński", "LRY": "powiat rycki",
+                                    "LSW": "powiat świdnicki", "LTM": "powiat tomaszowski", "LWL": "powiat włodawski", "LZA": "powiat zamojski",
+                                    "LLE": "powiat łęczyński", "LLU": "powiat łukowski", "NE": "Elbląg", "NO": "Olsztyn", "NBA": "powiat bartoszycki",
+                                    "NBR": "powiat braniewski", "NDZ": "powiat działdowski", "NEB": "powiat elbląski", "NEL": "powiat ełcki",
+                                    "NGI": "powiat giżycki", "NGO": "powiat gołdapski", "NIL": "powiat iławski", "NKE": "powiat kętrzyński",
+                                    "NLI": "powiat lidzbarski", "NMR": "powiat mrągowski", "NNI": "powiat nidzicki", "NNM": "powiat nowomiejski",
+                                    "NOE": "powiat olecki", "NOL": "powiat olsztyński", "NOS": "powiat ostródzki", "NPI": "powiat piski",
+                                    "NSZ": "powiat szczycieński", "NWE": "powiat węgorzewski", "OP": "Opole", "OB": "powiat brzeski", "OGL": "powiat głubczycki",
+                                    "OK": "powiat kędzierzyńsko-kozielski", "OKL": "powiat kluczborski", "OKR": "powiat krapkowicki",
+                                    "ONA": "powiat namysłowski", "ONY": "powiat nyski", "OOL": "powiat oleski", "OPO": "powiat opolski",
+                                    "OPR": "powiat prudnicki", "OST": "powiat strzelecki", "PK": "Kalisz", "PA": "Kalisz", "MK": "Kalisz", "MA": "Kalisz",
+                                    "PN": "Konin", "PKO": "Konin", "MN": "Konin", "MKO": "Konin", "PL": "Leszno", "ML": "Leszno", "PO": "Poznań", "MO": "Poznań",
+                                    "PY": "Poznań", "MY": "Poznań", "PCH": "powiat chodzieski", "MCH": "powiat chodzieski",
+                                    "PCT": "powiat czarnkowsko-trzcianecki", "MCT": "powiat czarnkowsko-trzcianecki",
+                                    "PGN": "powiat gnieźnieński", "MGN": "powiat gnieźnieński", "PGS": "powiat gostyński", "MGS": "powiat gostyński",
+                                    "PGO": "powiat grodziski", "MGO": "powiat grodziski", "PJA": "powiat jarociński", "MJA": "powiat jarociński",
+                                    "PKA": "powiat kaliski", "MKA": "powiat kaliski", "PKE": "powiat kępiński", "MKE": "powiat kępiński",
+                                    "PKL": "powiat kolski", "MKL": "powiat kolski", "PKN": "powiat koniński", "MKN": "powiat koniński",
+                                    "PKS": "powiat kościański", "MKS": "powiat kościański", "PKR": "powiat krotoszyński", "MKR": "powiat krotoszyński",
+                                    "PLE": "powiat leszczyński", "MLE": "powiat leszczyński", "PMI": "powiat międzychodzki", "MMI": "powiat międzychodzki",
+                                    "PNT": "powiat nowotomyski", "MNT": "powiat nowotomyski", "POB": "powiat obornicki", "MOB": "powiat obornicki",
+                                    "POS": "powiat ostrowski", "MOS": "powiat ostrowski", "POT": "powiat ostrzeszowski", "MOT": "powiat ostrzeszowski",
+                                    "PP": "powiat pilski", "MP": "powiat pilski", "PPL": "powiat pleszewski", "MPL": "powiat pleszewski",
+                                    "PZ": "powiat poznański", "POZ": "powiat poznański", "MZ": "powiat poznański", "MOZ": "powiat poznański",
+                                    "PRA": "powiat rawicki", "MRA": "powiat rawicki", "PSR": "powiat średzki", "MSR": "powiat średzki",
+                                    "PSE": "powiat śremski", "MSE": "powiat śremski", "PSZ": "powiat szamotulski", "MSZ": "powiat szamotulski",
+                                    "PSL": "powiat słupecki", "MSL": "powiat słupecki", "PTU": "powiat turecki", "MTU": "powiat turecki",
+                                    "PWA": "powiat wągrowiecki", "MWA": "powiat wągrowiecki", "PWL": "powiat wolsztyński", "MWL": "powiat wolsztyński",
+                                    "PWR": "powiat wrzesiński", "MWR": "powiat wrzesiński", "PZL": "powiat złotowski", "MZL": "powiat złotowski",
+                                    "RK": "Krosno", "YK": "Krosno", "RP": "Przemyśl", "YP": "Przemyśl", "RZ": "Rzeszów", "YZ": "Rzeszów",
+                                    "RT": "Tarnobrzeg", "YT": "Tarnobrzeg", "RBI": "powiat bieszczadzki", "YBI": "powiat bieszczadzki",
+                                    "RBR": "powiat brzozowski", "YBR": "powiat brzozowski", "RDE": "powiat dębicki", "YDE": "powiat dębicki",
+                                    "RJA": "powiat jarosławski", "YJA": "powiat jarosławski", "RJS": "powiat jasielski", "YJS": "powiat jasielski",
+                                    "RKL": "powiat kolbuszowski", "YKL": "powiat kolbuszowski", "RKR": "powiat krośnieński", "YKR": "powiat krośnieński",
+                                    "RLS": "powiat leski", "YLS": "powiat leski", "RLE": "powiat leżajski", "YLE": "powiat leżajski",
+                                    "RLU": "powiat lubaczowski", "YLU": "powiat lubaczowski", "RMI": "powiat mielecki", "YMI": "powiat mielecki",
+                                    "RNI": "powiat niżański", "YNI": "powiat niżański", "RPR": "powiat przemyski", "YPR": "powiat przemyski",
+                                    "RPZ": "powiat przeworski", "YPZ": "powiat przeworski", "RRS": "powiat ropczycko-sędziszowski", "YRS": "powiat ropczycko-sędziszowski",
+                                    "RZE": "powiat rzeszowski", "RZZ": "powiat rzeszowski", "RZR": "powiat rzeszowski", "YZE": "powiat rzeszowski", "YZZ": "powiat rzeszowski", "YZR": "powiat rzeszowski", "RSA": "powiat sanocki", "YSA": "powiat sanocki", "RST": "powiat stalowowolski", "YST": "powiat stalowowolski",
+                                    "RSR": "powiat strzyżowski", "YSR": "powiat strzyżowski", "RTA": "powiat tarnobrzeski", "YTA": "powiat tarnobrzeski",
+                                    "RLA": "powiat łańcucki", "YLA": "powiat łańcucki", "SB": "Bielsko-Biała", "IB": "Bielsko-Biała",
+                                    "SY": "Bytom", "IY": "Bytom", "SH": "Chorzów", "IH": "Chorzów", "SC": "Częstochowa", "IC": "Częstochowa",
+                                    "SD": "Dąbrowa Górnicza", "ID": "Dąbrowa Górnicza", "SG": "Gliwice", "IG": "Gliwice", "SJZ": "Jastrzębie-Zdrój", "IJZ": "Jastrzębie-Zdrój",
+                                    "SJ": "Jaworzno", "IJ": "Jaworzno", "SK": "Katowice", "IK": "Katowice", "SM": "Mysłowice", "IM": "Mysłowice",
+                                    "SPI": "Piekary Śląskie", "IPI": "Piekary Śląskie", "SL": "Ruda Śląska", "SRS": "Ruda Śląska", "IL": "Ruda Śląska", "IRS": "Ruda Śląska",
+                                    "SR": "Rybnik", "IR": "Rybnik", "SI": "Siemianowice Śląskie", "II": "Siemianowice Śląskie", "SO": "Sosnowiec", "IO": "Sosnowiec",
+                                    "SW": "Świętochłowice", "IW": "Świętochłowice", "ST": "Tychy", "IT": "Tychy", "SZ": "Zabrze", "IZ": "Zabrze", "SZO": "Żory", "IZO": "Żory",
+                                    "SBE": "powiat będziński", "SE": "powiat będziński", "SBN": "powiat będziński", "IBE": "powiat będziński", "IE": "powiat będziński", "IBN": "powiat będziński", "SBI": "powiat bielski", "IBI": "powiat bielski", "SBL": "powiat bieruńsko-lędziński", "IBL": "powiat bieruńsko-lędziński", "SCI": "powiat cieszyński", "SCN": "powiat cieszyński", "ICI": "powiat cieszyński", "ICN": "powiat cieszyński",
+                                    "SCZ": "powiat częstochowski", "ICZ": "powiat częstochowski", "SGL": "powiat gliwicki", "IGL": "powiat gliwicki",
+                                    "SKL": "powiat kłobucki", "IKL": "powiat kłobucki", "SLU": "powiat lubliniecki", "ILU": "powiat lubliniecki",
+                                    "SMI": "powiat mikołowski", "IMI": "powiat mikołowski", "SMY": "powiat myszkowski", "IMY": "powiat myszkowski",
+                                    "SPS": "powiat pszczyński", "IPS": "powiat pszczyński", "SRC": "powiat raciborski", "IRC": "powiat raciborski",
+                                    "SRB": "powiat rybnicki", "IRB": "powiat rybnicki", "STA": "powiat tarnogórski", "ITA": "powiat tarnogórski",
+                                    "IWD": "powiat wodzisławski", "IWZ": "powiat wodzisławski", "SWD": "powiat wodzisławski", "SWZ": "powiat wodzisławski",
+                                    "SZA": "powiat zawierciański", "IZA": "powiat zawierciański", "SZY": "powiat żywiecki", "IZY": "powiat żywiecki",
+                                    "TK": "Kielce", "TBU": "powiat buski", "TJE": "powiat jędrzejowski", "TKA": "powiat kazimierski", "TKI": "powiat kielecki",
+                                    "TKN": "powiat konecki", "TOP": "powiat opatowski", "TOS": "powiat ostrowiecki", "TPI": "powiat pińczowski",
+                                    "TSA": "powiat sandomierski", "TSK": "powiat skarżyski", "TST": "powiat starachowicki", "TSZ": "powiat staszowski",
+                                    "TLW": "powiat włoszczowski", "WO": "Ostrołęka", "AO": "Ostrołęka", "WP": "Płock", "AP": "Płock", "WR": "Radom", "AR": "Radom",
+                                    "WS": "Siedlce", "AS": "Siedlce", "WB": "Warszawa Bemowo", "AB": "Warszawa Bemowo",
+                                    "WA": "Warszawa Białołęka", "AA": "Warszawa Białołęka", "WD": "Warszawa Bielany", "AD": "Warszawa Bielany",
+                                    "WE": "Warszawa Mokotów", "AE": "Warszawa Mokotów", "WU": "Warszawa Ochota", "AU": "Warszawa Ochota",
+                                    "WH": "Warszawa Praga Północ", "AH": "Warszawa Praga Północ", "WF": "Warszawa Praga Południe", "AF": "Warszawa Praga Południe",
+                                    "WI": "Warszawa Śródmieście", "AI": "Warszawa Śródmieście", "WJ": "Warszawa Targówek", "AJ": "Warszawa Targówek",
+                                    "WK": "Warszawa Ursus", "AK": "Warszawa Ursus", "WN": "Warszawa Ursynów", "AN": "Warszawa Ursynów",
+                                    "WT": "Warszawa Wawer", "AT": "Warszawa Wawer", "WBR": "powiat białobrzeski", "ABR": "powiat białobrzeski",
+                                    "WCI": "powiat ciechanowski", "ACI": "powiat ciechanowski", "WG": "powiat garwoliński", "AG": "powiat garwoliński",
+                                    "WGS": "powiat gostyniński", "AGS": "powiat gostyniński", "WGM": "powiat grodziski", "AGM": "powiat grodziski",
+                                    "WGR": "powiat grójecki", "AGR": "powiat grójecki", "WKZ": "powiat kozienicki", "AKZ": "powiat kozienicki",
+                                    "WL": "powiat legionowski", "AL": "powiat legionowski", "WLI": "powiat lipski", "ALI": "powiat lipski",
+                                    "WMA": "powiat makowski", "AMA": "powiat makowski", "WM": "powiat miński", "AM": "powiat miński",
+                                    "WML": "powiat mławski", "AML": "powiat mławski", "WND": "powiat nowodworski", "AND": "powiat nowodworski",
+                                    "WOR": "powiat ostrowski", "AOR": "powiat ostrowski", "WOS": "powiat ostrołęcki", "AOS": "powiat ostrołęcki",
+                                    "WOT": "powiat otwocki", "AOT": "powiat otwocki", "WPI": "powiat piaseczyński", "WPA": "powiat piaseczyński", "WPW": "powiat piaseczyński", "WPX": "powiat piaseczyński", "API": "powiat piaseczyński", "APA": "powiat piaseczyński", "APW": "powiat piaseczyński", "APX": "powiat piaseczyński", "WPS": "powiat pruszkowski", "WPR": "powiat pruszkowski", "WPP": "powiat pruszkowski",
+                                    "APS": "powiat pruszkowski", "APR": "powiat pruszkowski", "APP": "powiat pruszkowski",
+                                    "WPZ": "powiat przasnyski", "APZ": "powiat przasnyski", "WPY": "powiat przysuski", "APY": "powiat przysuski",
+                                    "WPU": "powiat pułtuski", "APU": "powiat pułtuski", "WPL": "powiat płocki", "APL": "powiat płocki",
+                                    "WPN": "powiat płoński", "APN": "powiat płoński", "WRA": "powiat radomski", "ARA": "powiat radomski",
+                                    "WSI": "powiat siedlecki", "ASI": "powiat siedlecki", "WSE": "powiat sierpecki", "ASE": "powiat sierpecki",
+                                    "WSC": "powiat sochaczewski", "ASC": "powiat sochaczewski", "WSK": "powiat sokołowski", "ASK": "powiat sokołowski",
+                                    "WSZ": "powiat szydłowiecki", "ASZ": "powiat szydłowiecki", "WZ": "powiat warszawski zachodni", "AZ": "powiat warszawski zachodni",
+                                    "WWE": "powiat węgrowski", "AWE": "powiat węgrowski", "WWL": "powiat wołomiński", "AWL": "powiat wołomiński",
+                                    "WV": "powiat wołomiński", "AV": "powiat wołomiński", "WWY": "powiat wyszkowski", "AWY": "powiat wyszkowski",
+                                    "WZU": "powiat żuromiński", "AZU": "powiat żuromiński", "WZW": "powiat zwoleński", "AZW": "powiat zwoleński",
+                                    "WZY": "powiat żyrardowski", "AZY": "powiat żyrardowski", "WLS": "powiat łosicki", "ALS": "powiat łosicki",
+                                    "ZK": "Koszalin", "ZSW": "Świnoujście", "ZS": "Szczecin", "ZZ": "Szczecin", "ZBI": "powiat białogardzki",
+                                    "ZCH": "powiat choszczeński", "ZDR": "powiat drawski", "ZGL": "powiat goleniowski", "ZGY": "powiat gryficki",
+                                    "ZGR": "powiat gryfiński", "ZKA": "powiat kamieński", "ZKO": "powiat koszaliński", "ZKL": "powiat kołobrzeski",
+                                    "ZMY": "powiat myśliborski", "ZPL": "powiat policki", "ZPY": "powiat pyrzycki", "ZST": "powiat stargardzki",
+                                    "ZSD": "powiat świdwiński", "ZSZ": "powiat szczecinecki", "ZSL": "powiat sławieński", "ZWA": "powiat wałecki",
+                                    "ZLO": "powiat łobeski"}
+wojsko = {"UAxxxxx": "samochód osobowy", "UBxxxxx": "Transporter opancerzony", "UCxxxxx": "Samochód dostawczy",
+          "UDxxxxx": "Autobus", "UExxxxx": "Samochód ciężarowy", "UGxxxxx": "Pojazd specjalny na podwoziu ciężarowym", "UIxxxxx": "Przyczepa transportowa",
+          "UJxxxxx": "Przyczepa specjalna", "UKxxxxx": "Motocykl"}
+kontrola_skarbowa = {"HSBxxxxx": "Woj. podlaskie", "HSCxxxxx": "Woj. kujawsko-pomorskie", "HSDxxxxx": "Woj. dolnośląskie",
+                     "HSExxxxx": "Woj. łódzkie", "HSFxxxxx": "Woj. lubuskie","HSGxxxxx": "Woj. pomorskie", "HSKxxxxx": "Woj. małopolskie",
+                     "HSLxxxxx": "Woj. lubelskie", "HSNxxxxx": "Woj. warmińsko-mazurskie", "HSOxxxxx": "Woj. opolskie", "HSPxxxxx": "Woj. wielkopolskie",
+                     "HSRxxxxx": "Woj. podkarpackie", "HSSxxxxx": "Woj. śląskie", "HSTxxxxx": "Woj. świętokrzyskie", "HSWxxxxx": "Woj. mazowieckie", "HSZxxxxx": "Woj. zachodniopomorskie"}
+sluzba_celna = {"HCAxxxxx": "Olsztyn", "HCBxxxxx": "Białystok", "HCCxxxxx": "Biała Podlaska", "HCGxxxxx": "Wrocław", "HCHxxxxx": "Rzepin", "HCJxxxxx": "Szczecin", "HCKxxxxx": "Gdynia", "HCLxxxxx": "Warszawa", "HCMxxxxx": "Toruń",
+                "HCNxxxxx": "Łódź", "HCOxxxxx": "Poznań", "HCPxxxxx": "Opole", "HCRxxxxx": "Kielce"}
+policja = {"HPAxxxxx": "Komenda Główna Policji", "HPBxxxxx": "Woj. dolnośląskie", "HPCxxxxx": "Woj. kujawsko-pomorskie", "HPDxxxxx": "Woj. lubelskie", "HPExxxxx": "Woj. lubuskie", "HPFxxxxx": "Woj. łódzkie", "HPGxxxxx": "Woj. małopolskie",
+           "HPHxxxxx": "Woj. mazowieckie", "HPJxxxxx": "Woj. opolskie", "HPKxxxxx": "Woj. podkarpackie", "HPLxxxxx": "Szkoła Policji",
+           "HPMxxxxx": "Woj. podlaskie", "HPNxxxxx": "Woj. pomorskie", "HPPxxxxx": "Woj. śląskie", "HPSxxxxx": "Woj. świętokrzyskie", "HPTxxxxx": "Woj. warmińsko-mazurskie",
+           "HPUxxxxx": "Woj. wielkopolskie", "HPWxxxxx": "Woj. zachodniopomorskie", "HPZxxxxx": "Komenda Stołeczna Policji"}
+inne_sluzby = {"HAxxxxx": "Centralne Biuro Antykorupcyjne", "HBxxxxx": "Służba Ochrony Państwa", "HKxxxxx": "ABW lub AW", "HWxxxxx": "Straż Graniczna", "HMxxxxx": "SWW lub SKW"}
 
 class MenuApp(tk.Tk):
     def __init__(self):
@@ -195,7 +427,7 @@ class Pogoda(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_close_window)
         self.current_page = None
         self.resizable(False, False)
-        self.geometry("270x230") 
+        self.geometry("270x230")
         self.strona_pierwsza()
 
         self.show_page(self.page1)
@@ -224,13 +456,15 @@ class Pogoda(tk.Toplevel):
 
         self.label_start = Label(
             self.top_frame, text="Warunki atmosferyczne\n dla wybranej stacji pomiarowej IMGW")
-        self.label_start.grid(row=1, column=0, padx=5, pady=5, sticky=EW, columnspan=3)
+        self.label_start.grid(row=1, column=0, padx=5,
+                              pady=5, sticky=EW, columnspan=3)
 
         self.option_var = StringVar(self.top_frame)
         self.max_length = max(len(option) for option in self.opcje_miast)
 
         self.choice_frame = Frame(self.page1)
-        self.choice_frame.grid(row=2, column=0, sticky=NS, padx=10, pady=10, columnspan=3)
+        self.choice_frame.grid(row=2, column=0, sticky=NS,
+                               padx=10, pady=10, columnspan=3)
 
         scrollbar = Scrollbar(self.choice_frame)
         scrollbar.grid(row=0, column=1, sticky=NS)
@@ -247,8 +481,9 @@ class Pogoda(tk.Toplevel):
         scrollbar.config(command=self.listbox.yview)
 
         self.button_frame = Frame(self.page1)
-        self.button_frame.grid(row=3, column=0, sticky=NS, padx=10, pady=10, columnspan=3)
-        
+        self.button_frame.grid(row=3, column=0, sticky=NS,
+                               padx=10, pady=10, columnspan=3)
+
         self.button = Button(
             self.button_frame, text='POKAŻ', command=self.pokaz_pogode)
         self.button.grid(row=0, column=0, sticky=NS, padx=5, pady=5)
@@ -470,238 +705,56 @@ class Tablice(tk.Toplevel):
 
         self.label = tk.Label(
             self.page1, text="Wprowadź numer tablicy rejestracyjnej")
-        self.label.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        self.label.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
         self.entry = tk.Entry(self.page1)
-        self.entry.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        self.entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5)
+
+        self.przyciski = tk.Frame(self.page1)
+        self.przyciski.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
 
         self.check_button = tk.Button(
-            self.page1, text="SPRAWDŹ", command=self.check_tablica)
-        self.check_button.grid(row=2, column=0, padx=5, pady=5)
+            self.przyciski, text="SPRAWDŹ", command=self.check_tablica)
+        self.check_button.grid(row=0, column=0, padx=5, pady=5)
 
         self.back_to_menu_button = tk.Button(
-            self.page1, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_to_menu_button.grid(row=2, column=1, padx=5, pady=5)
-
+            self.przyciski, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_to_menu_button.grid(row=0, column=1, padx=5, pady=5)
+        
+        separator1 = ttk.Separator(self.page1)
+        separator1.grid(row=3, column=0, columnspan=3, sticky='ew', padx=10, pady=10)       
+         
         self.result_label = tk.Label(self.page1, text="")
-        self.result_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+        self.result_label.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+        
+        separator2 = ttk.Separator(self.page1)
+        separator2.grid(row=5, column=0, columnspan=3, sticky='ew', padx=10, pady=10)  
+        
+        self.dyplomaci_button = tk.Button(
+            self.page1, text="Tablice dyplomatyczne", command=self.dyplomaci, width=17, height=2)
+        self.dyplomaci_button.grid(row=6, column=0, padx=5, pady=5)
+
+        self.wojsko_button = tk.Button(
+            self.page1, text="Siły zbrojne RP", command=self.wojsko, width=17, height=2)
+        self.wojsko_button.grid(row=6, column=1, padx=5, pady=5)
+        
+        self.skarbowka_button = tk.Button(
+            self.page1, text="Kontrola Skarbowa", command=self.kontrola_skarbowa, width=17, height=2)
+        self.skarbowka_button.grid(row=6, column=2, padx=5, pady=5)
+
+        self.celnicy_button = tk.Button(
+            self.page1, text="Służba Celna", command=self.sluzba_celna, width=17, height=2)
+        self.celnicy_button.grid(row=7, column=0, padx=5, pady=5)
+
+        self.policja_button = tk.Button(
+            self.page1, text="Policja", command=self.policja, width=17, height=2)
+        self.policja_button.grid(row=7, column=1, padx=5, pady=5)
+        
+        self.sluzby_button = tk.Button(
+            self.page1, text="Inne Służby", command=self.inne_sluzby, width=17, height=2)
+        self.sluzby_button.grid(row=7, column=2, padx=5, pady=5)
 
     def check_tablica(self):
-        tablice_dyplomatyczne_funkcja = {(0, 199): "Prywatny pojazd personelu dyplomatycznego ambasady",
-                                         (200, 299): "Prywatny pojazd attaché wojskowego",
-                                         (300, 499): "Prywatny pojazd personelu niedyplomatycznego ambasady",
-                                         (500, 501): "Służbowy pojazd ambasadora",
-                                         (502, 699): "Służbowy pojazd ambasady",
-                                         (700, 799): "Prywatny pojazd personelu dyplomatycznego konsulatu generalnego",
-                                         (800, 899): "Prywatny pojazd personelu niedyplomatycznego konsulatu generalnego",
-                                         (900, 901): "Służbowy pojazd konsula generalnego",
-                                         (902, 999): "Służbowy pojazd konsulatu generalnego"}
-
-        tablice_wojewodztwa = {"B": "podlaskie", "C": "kujawsko-pomorskie", "D": "dolnośląskie", "E": "łódzkie", "F": "lubuskie",
-                               "G": "pomorskie", "X": "pomorskie", "K": "małopolskie", "L": "lubelskie", "N": "warmińsko-mazurskie",
-                               "O": "opolskie", "P": "wielkopolskie", "R": "podkarpackie", "S": "śląskie", "T": "świętokrzyskie", "W": "mazowieckie",
-                               "Z": "zachodniopomorskie", "I": "śląskie", "J": "małopolskie", "M": "wielkopolskie", "Y": "podkarpackie",
-                               "V": "dolnośląskie", "A": "mazowieckie"}
-
-        tablice_dyplomatyczne_kraj = {"001": "USA", "002": "Wielka Brytania", "003": "Francja", "004": "Kanada",
-                                      "005": "Niemcy", "006": "Holandia", "007": "Włochy", "008": "Austria", "009": "Japonia",
-                                      "010": "Turcja", "011": "Belgia", "012": "Dania", "013": "Norwegia", "014": "Grecja",
-                                      "015": "Australia", "016": "Algieria", "017": "Afganistan", "018": "Argentyna",
-                                      "019": "Brazylia", "020": "Bangladesz", "021": "Egipt", "022": "Ekwador", "023": "Finlandia",
-                                      "024": "Hiszpania", "025": "Irak", "026": "Iran", "027": "Indie", "028": "Indonezja",
-                                      "029": "Kolumbia", "030": "Malezja", "031": "Libia", "032": "Maroko", "033": "Meksyk",
-                                      "034": "Nigeria", "035": "Pakistan", "036": "Portugalia", "037": "Palestyna", "038": "Syria",
-                                      "039": "Szwecja", "040": "Szwajcaria", "041": "Tunezja", "042": "Tajlandia", "043": "Wenezuela",
-                                      "044": "Urugwaj", "045": "Peru", "046": "Jemen", "047": "Kostaryka", "048": "Kongo",
-                                      "049": "Izrael", "050": "Nikaragua", "051": "Chile", "052": "Watykan", "053": "Korea Południowa",
-                                      "054": "Przedstawicielstwo Komisji Wspólnot Europejskich", "055": "Irlandia", "056": "Bank Światowy",
-                                      "057": "Międzynarodowy Fundusz Walutowy", "058": "Filipiny", "059": "Międzynarodowa Korporacja Finansowa",
-                                      "060": "RPA", "061": "Biuro Instytucji Demokratycznych i Praw Człowieka OBWE", "062": "Cypr",
-                                      "063": "Kuwejt", "064": "Organizacja Narodów Zjednoczonych", "065": "Rosja", "066": "Słowacja",
-                                      "067": "Czechy", "068": "Bułgaria", "069": "Węgry", "070": "Rumunia", "071": "Wietnam",
-                                      "072": "Serbia", "073": "Korea Północna", "074": "Kuba", "075": "Albania", "076": "Chiny",
-                                      "077": "Mongolia", "078": "Międzynarodowa Organizacja Pracy", "079": "Organizacja Kooperacyjna ds. Kolei",
-                                      "080": "Klub Dyplomatyczny", "081": "Laos", "082": "Angola", "083": "Ukraina", "084": "Europejski Bank Odbudowy i Rozwoju",
-                                      "085": "Litwa", "086": "Białoruś", "087": "Łotwa", "088": "Chorwacja", "089": "Liban",
-                                      "090": "Słowenia", "091": "Gwatemala", "092": "Estonia", "093": "Macedonia", "094": "Mołdawia",
-                                      "095": "Izrael", "096": "Armenia", "097": "Sri Lanka", "098": "Kazachstan", "099": "Arabia Saudyjska",
-                                      "100": "Gruzja", "101": "Uzbekistan", "102": "UN-HABITAT", "103": "Nowa Zelandia", "104": "Azerbejdżan",
-                                      "105": "Suwerenny Wojskowy Zakon Maltański", "106": "Kambodża", "107": "Frontex", "108": "Luksemburg",
-                                      "109": "Bośnia i Hercegowina", "110": "Panama", "111": "Katar", "112": "Malta",
-                                      "113": "Zjednoczone Emiraty Arabskie", "114": "Czarnogóra", "115": "Senegal"}
-
-        polskie_tablice_rejestracyjne = {"UA": "Siły zbrojne RP:\n samochód osobowy, osobowo-terenowy\n lub specjalny na podwoziu osobowym",
-                                         "UB": "Siły zbrojne RP:\n transporter opancerzony", "UC": "Siły zbrojne RP:\n samochód dostawczy",
-                                         "UD": "Siły zbrojne RP:\n autobus", "UE": "Siły zbrojne RP:\n samochód ciężarowy lub ciężarowo-terenowy\n o przeznaczeniu transportowym",
-                                         "UG": "Siły zbrojne RP:\n pojazd specjalny\n na podwoziu ciężarowym", "UI": "Siły zbrojne RP:\n przyczepa transportowa",
-                                         "UJ": "Siły zbrojne RP:\n przyczepa specjalna", "UK": "Siły zbrojne RP:\n motocykl", "HSB": "Kontrola skarbowa\n woj. podlaskie", "HSC": "Kontrola skarbowa\n woj. kujawsko-pomorskie", "HSD": "Kontrola skarbowa\n woj. dolnośląskie",
-                                         "HSE": "Kontrola skarbowa\n woj. łódzkie", "HSF": "Kontrola skarbowa\n woj. lubuskie",
-                                         "HSG": "Kontrola skarbowa\n woj. pomorskie", "HSK": "Kontrola skarbowa\n woj. małopolskie",
-                                         "HSL": "Kontrola skarbowa\n woj. lubelskie", "HSN": "Kontrola skarbowa\n woj. warmińsko-mazurskie",
-                                         "HSO": "Kontrola skarbowa\n woj. opolskie", "HSP": "Kontrola skarbowa\n woj. wielkopolskie",
-                                         "HSR": "Kontrola skarbowa\n woj. podkarpackie", "HSS": "Kontrola skarbowa\n woj. śląskie",
-                                         "HST": "Kontrola skarbowa\n woj. świętokrzyskie", "HSW": "Kontrola skarbowa\n woj. mazowieckie",
-                                         "HSZ": "Kontrola skarbowa\n woj. zachodniopomorskie", "HCA": "Służba celna Olsztyn",
-                                         "HCB": "Służba celna Białystok", "HCC": "Służba celna Biała Podlaska",
-                                         "HCD": "Służba celna Przemyśl", "HCE": "Służba celna Kraków", "HCF": "Służba celna Katowice",
-                                         "HCG": "Służba celna Wrocław", "HCH": "Służba celna Rzepin", "HCJ": "Służba celna Szczecin",
-                                         "HCK": "Służba celna Gdynia", "HCL": "Służba celna Warszawa", "HCM": "Służba celna Toruń",
-                                         "HCN": "Służba celna Łódź", "HCO": "Służba celna Poznań", "HCP": "Służba celna Opole",
-                                         "HCR": "Służba celna Kielce", "HPA": "Komenda Główna Policji", "HPB": "Policja woj. dolnośląskie",
-                                         "HPC": "Policja woj. kujawsko-pomorskie", "HPD": "Policja woj. lubelskie",
-                                         "HPE": "Policja woj. lubuskie", "HPF": "Policja woj. łódzkie", "HPG": "Policja woj. małopolskie",
-                                         "HPH": "Policja woj. mazowieckie", "HPJ": "Policja woj. opolskie", "HPK": "Policja woj. podkarpackie", "HPL": "Szkoła Policji w Szczytnie/Pile/Słupsku/Katowicach\n lub Centrum Szkolenia Policji w Legionowie",
-                                         "HPM": "Policja woj. podlaskie", "HPN": "Policja woj. pomorskie", "HPP": "Policja woj. śląskie",
-                                         "HPS": "Policja woj. świętokrzyskie", "HPT": "Policja woj. warmińsko-mazurskie",
-                                         "HPU": "Policja woj. wielkopolskie", "HPW": "Policja woj. zachodniopomorskie",
-                                         "HPZ": "Komenda Stołeczna Policji", "HA": "Centralne Biuro Antykorupcyjne",
-                                         "HB": "Służba Ochrony Państwa", "HK": "Agencja Bezpieczeństwa Wewnętrznego\n lub Agencja Wywiadu",
-                                         "HW": "Straż Graniczna", "HM": "Służba Wywiadu Wojskowego\n lub Służba Kontrwywiadu Wojskowego", "BI": "Białystok", "BS": "Suwałki", "BL": "Łomża", "BAU": "powiat augustowski",
-                                         "BIA": "powiat białostocki", "BBI": "powiat bielski", "BGR": "powiat grajewski", "BHA": "powiat hajnowski",
-                                         "BKL": "powiat kolneński", "BMN": "powiat moniecki", "BSE": "powiat sejneński", "BSI": "powiat siemiatycki",
-                                         "BSK": "powiat sokólski", "BSU": "powiat suwalski", "BWM": "powiat wysokomazowiecki", "BZA": "powiat zambrowski",
-                                         "BLM": "powiat łomżyński", "CB": "Bydgoszcz", "CG": "Grudziądz", "CT": "Toruń", "CW": "Włocławek", "CAL": "powiat aleksandrowski",
-                                         "CBR": "powiat brodnicki", "CBY": "powiat bydgoski", "CCH": "powiat chełmiński", "CGD": "powiat golubsko-dobrzyński",
-                                         "CGR": "powiat grudziądzki", "CIN": "powiat inowrocławski", "CLI": "powiat lipnowski", "CMG": "powiat mogileński",
-                                         "CNA": "powiat nakielski", "CRA": "powiat radziejowski", "CRY": "powiat rypiński", "CSE": "powiat sępoleński",
-                                         "CSW": "powiat świecki", "CTR": "powiat toruński", "CTU": "powiat tucholski", "CWA": "powiat wąbrzeski",
-                                         "CWL": "powiat włocławski", "CZN": "powiat żniński", "DJ": "Jelenia Góra", "VJ": "Jelenia Góra", "DL": "Legnica", "DB": "Wałbrzych", "VL": "Legnica", "VB": "Wałbrzych", "DW": "Wrocław", "DX": "Wrocław", "VW": "Wrocław", "VX": "Wrocław", "VBL": "powiat bolesławiecki",
-                                         "DBL": "powiat bolesławiecki", "VBL": "powiat bolesławiecki", "DDZ": "powiat dzierżoniowski", "VDZ": "powiat dzierżoniowski",
-                                         "DGR": "powiat górowski", "VGR": "powiat górowski", "DGL": "powiat głogowski", "VGL": "powiat głogowski",
-                                         "DGL": "powiat głogowski", "VGL": "powiat głogowski", "DJE": "powiat jeleniogórski", "VJE": "powiat jeleniogórski",
-                                         "DKA": "powiat kamiennogórski", "VKA": "powiat kamiennogórski", "DKL": "powiat kłodzki", "VKL": "powiat kłodzki",
-                                         "DLE": "powiat legnicki", "VLE": "powiat legnicki", "DLB": "powiat lubański", "VLB": "powiat lubański",
-                                         "DLU": "powiat lubiński", "VLU": "powiat lubiński", "DLW": "powiat lwówecki", "VLW": "powiat lwówecki",
-                                         "DMI": "powiat milicki", "VMI": "powiat milicki", "DOL": "powiat oleśnicki", "VOL": "powiat oleśnicki",
-                                         "DOA": "powiat oławski", "VOA": "powiat oławski", "DPL": "powiat polkowicki", "VPL": "powiat polkowicki",
-                                         "DSR": "powiat średzki", "VSR": "powiat średzki", "DST": "powiat strzeliński", "VST": "powiat strzeliński",
-                                         "DSW": "powiat świdnicki", "VSW": "powiat świdnicki", "DTR": "powiat trzebnicki", "VTR": "powiat trzebnicki",
-                                         "DBA": "powiat wałbrzyski", "VBA": "powiat wałbrzyski", "DWL": "powiat wołowski", "VWL": "powiat wołowski",
-                                         "DWR": "powiat wrocławski", "VWR": "powiat wrocławski", "DZA": "powiat ząbkowicki", "VZA": "powiat ząbkowicki",
-                                         "DZG": "powiat zgorzelecki", "VZG": "powiat zgorzelecki", "DZL": "powiat złotoryjski", "VZL": "powiat złotoryjski", "ED": "Łódź",
-                                         "EP": "Piotrków Trybunalski", "ES": "Skierniewice", "EL": "Łódź", "EBE": "powiat bełchatowski", "EBR": "powiat brzeziński", "EKU": "powiat kutnowski", "EOP": "powiat opoczyński", "EPA": "powiat pabianicki", "EPJ": "powiat pajęczański", "EPI": "powiat piotrkowski",
-                                         "EPD": "powiat poddębicki", "ERA": "powiat radomszczański", "ERW": "powiat rawski", "ESI": "powiat sieradzki",
-                                         "ESK": "powiat skierniewicki", "ETM": "powiat tomaszowski", "EWI": "powiat wieluński", "EWE": "powiat wieruszowski",
-                                         "EZD": "powiat zduńskowolski", "EZG": "powiat zgierski", "ELA": "powiat łaski", "ELE": "powiat łęczycki",
-                                         "ELW": "powiat łódzki wschodni", "ELC": "powiat łowicki", "FG": "Gorzów Wielkopolski", "FZ": "Zielona Góra",
-                                         "FGW": "powiat gorzowski", "FKR": "powiat krośnieński", "FMI": "powiat międzyrzecki", "FNW": "powiat nowosolski",
-                                         "FSD": "powiat strzelecko-drezdenecki", "FSU": "powiat sulęciński", "FSW": "powiat świebodziński",
-                                         "FSL": "powiat słubicki", "FWS": "powiat wschowski", "FZG": "powiat żagański", "FZA": "powiat żarski",
-                                         "FZI": "powiat zielonogórski", "GD": "Gdańsk", "XD": "Gdańsk", "GA": "Gdynia", "XA": "Gdynia",
-                                         "GSP": "Sopot", "XSP": "Sopot", "GS": "Słupsk", "XS": "Słupsk", "GBY": "powiat bytowski", "XBY": "powiat bytowski",
-                                         "GCH": "powiat chojnicki", "XCH": "powiat chojnicki", "GCZ": "powiat człuchowski", "XCZ": "powiat człuchowski",
-                                         "GDA": "powiat gdański", "XDA": "powiat gdański", "GKA": "powiat kartuski", "GKY": "powiat kartuski", "GKZ": "powiat kartuski",
-                                         "XKA": "powiat kartuski", "XKY": "powiat kartuski", "XKZ": "powiat kartuski", "GKS": "powiat kościerski", "XKS": "powiat kościerski",
-                                         "GKW": "powiat kwidzyński", "XKW": "powiat kwidzyński", "GLE": "powiat lęborski", "XLE": "powiat lęborski",
-                                         "GMB": "powiat malborski", "XMB": "powiat malborski", "GND": "powiat nowodworski", "XND": "powiat nowodworski",
-                                         "GPU": "powiat pucki", "XPU": "powiat pucki", "GST": "powiat starogardzki", "XST": "powiat starogardzki",
-                                         "GSZ": "powiat sztumski", "XSZ": "powiat sztumski", "GSL": "powiat słupski", "XSL": "powiat słupski",
-                                         "GTC": "powiat tczewski", "XTC": "powiat tczewski", "GWE": "powiat wejherowski", "GWO": "powiat wejherowski",
-                                         "XWE": "powiat wejherowski", "XWO": "powiat wejherowski", "KK": "Kraków", "KR": "Kraków", "JK": "Kraków", "JR": "Kraków",
-                                         "KN": "Nowy Sącz", "JN": "Nowy Sącz", "KT": "Tarnów", "JT": "Tarnów", "KBC": "powiat bocheński", "JBC": "powiat bocheński",
-                                         "KBA": "powiat bocheński", "JBA": "powiat bocheński", "KBR": "powiat brzeski", "JBR": "powiat brzeski",
-                                         "KCH": "powiat chrzanowski", "JCH": "powiat chrzanowski", "KDA": "powiat dąbrowski", "JDA": "powiat dąbrowski",
-                                         "KGR": "powiat gorlicki", "JGR": "powiat gorlicki", "KRA": "powiat krakowski", "JRA": "powiat krakowski",
-                                         "KLI": "powiat limanowski", "JLI": "powiat limanowski", "KMI": "powiat miechowski", "JMI": "powiat miechowski",
-                                         "KMY": "powiat myślenicki", "JMY": "powiat myślenicki", "KNS": "powiat nowosądecki", "JNS": "powiat nowosądecki",
-                                         "KNT": "powiat nowotarski", "JNT": "powiat nowotarski", "KOL": "powiat olkuski", "JOL": "powiat olkuski",
-                                         "KOS": "powiat oświęcimski", "JOS": "powiat oświęcimski", "KPR": "powiat proszowicki", "JPR": "powiat proszowicki",
-                                         "KSU": "powiat suski", "JSU": "powiat suski", "KTA": "powiat tarnowski", "JTA": "powiat tarnowski",
-                                         "KTT": "powiat tatrzański", "JTT": "powiat tatrzański", "KWA": "powiat wadowicki", "JWA": "powiat wadowicki",
-                                         "KWI": "powiat wielicki", "JWI": "powiat wielicki", "LB": "Biała Podlaska", "LC": "Chełm", "LU": "Lublin", "LZ": "Zamość", "LBI": "powiat bialski", "LBL": "powiat biłgorajski", "LCH": "powiat chełmski", "LHR": "powiat hrubieszowski", "LJA": "powiat janowski", "LKR": "powiat kraśnicki",
-                                         "LKS": "powiat krasnostawski", "LLB": "powiat lubartowski", "LUB": "powiat lubelski", "LOP": "powiat opolski",
-                                         "LPA": "powiat parczewski", "LPU": "powiat puławski", "LRA": "powiat radzyński", "LRY": "powiat rycki",
-                                         "LSW": "powiat świdnicki", "LTM": "powiat tomaszowski", "LWL": "powiat włodawski", "LZA": "powiat zamojski",
-                                         "LLE": "powiat łęczyński", "LLU": "powiat łukowski", "NE": "Elbląg", "NO": "Olsztyn", "NBA": "powiat bartoszycki",
-                                         "NBR": "powiat braniewski", "NDZ": "powiat działdowski", "NEB": "powiat elbląski", "NEL": "powiat ełcki",
-                                         "NGI": "powiat giżycki", "NGO": "powiat gołdapski", "NIL": "powiat iławski", "NKE": "powiat kętrzyński",
-                                         "NLI": "powiat lidzbarski", "NMR": "powiat mrągowski", "NNI": "powiat nidzicki", "NNM": "powiat nowomiejski",
-                                         "NOE": "powiat olecki", "NOL": "powiat olsztyński", "NOS": "powiat ostródzki", "NPI": "powiat piski",
-                                         "NSZ": "powiat szczycieński", "NWE": "powiat węgorzewski", "OP": "Opole", "OB": "powiat brzeski", "OGL": "powiat głubczycki",
-                                         "OK": "powiat kędzierzyńsko-kozielski", "OKL": "powiat kluczborski", "OKR": "powiat krapkowicki",
-                                         "ONA": "powiat namysłowski", "ONY": "powiat nyski", "OOL": "powiat oleski", "OPO": "powiat opolski",
-                                         "OPR": "powiat prudnicki", "OST": "powiat strzelecki", "PK": "Kalisz", "PA": "Kalisz", "MK": "Kalisz", "MA": "Kalisz",
-                                         "PN": "Konin", "PKO": "Konin", "MN": "Konin", "MKO": "Konin", "PL": "Leszno", "ML": "Leszno", "PO": "Poznań", "MO": "Poznań",
-                                         "PY": "Poznań", "MY": "Poznań", "PCH": "powiat chodzieski", "MCH": "powiat chodzieski",
-                                         "PCT": "powiat czarnkowsko-trzcianecki", "MCT": "powiat czarnkowsko-trzcianecki",
-                                         "PGN": "powiat gnieźnieński", "MGN": "powiat gnieźnieński", "PGS": "powiat gostyński", "MGS": "powiat gostyński",
-                                         "PGO": "powiat grodziski", "MGO": "powiat grodziski", "PJA": "powiat jarociński", "MJA": "powiat jarociński",
-                                         "PKA": "powiat kaliski", "MKA": "powiat kaliski", "PKE": "powiat kępiński", "MKE": "powiat kępiński",
-                                         "PKL": "powiat kolski", "MKL": "powiat kolski", "PKN": "powiat koniński", "MKN": "powiat koniński",
-                                         "PKS": "powiat kościański", "MKS": "powiat kościański", "PKR": "powiat krotoszyński", "MKR": "powiat krotoszyński",
-                                         "PLE": "powiat leszczyński", "MLE": "powiat leszczyński", "PMI": "powiat międzychodzki", "MMI": "powiat międzychodzki",
-                                         "PNT": "powiat nowotomyski", "MNT": "powiat nowotomyski", "POB": "powiat obornicki", "MOB": "powiat obornicki",
-                                         "POS": "powiat ostrowski", "MOS": "powiat ostrowski", "POT": "powiat ostrzeszowski", "MOT": "powiat ostrzeszowski",
-                                         "PP": "powiat pilski", "MP": "powiat pilski", "PPL": "powiat pleszewski", "MPL": "powiat pleszewski",
-                                         "PZ": "powiat poznański", "POZ": "powiat poznański", "MZ": "powiat poznański", "MOZ": "powiat poznański",
-                                         "PRA": "powiat rawicki", "MRA": "powiat rawicki", "PSR": "powiat średzki", "MSR": "powiat średzki",
-                                         "PSE": "powiat śremski", "MSE": "powiat śremski", "PSZ": "powiat szamotulski", "MSZ": "powiat szamotulski",
-                                         "PSL": "powiat słupecki", "MSL": "powiat słupecki", "PTU": "powiat turecki", "MTU": "powiat turecki",
-                                         "PWA": "powiat wągrowiecki", "MWA": "powiat wągrowiecki", "PWL": "powiat wolsztyński", "MWL": "powiat wolsztyński",
-                                         "PWR": "powiat wrzesiński", "MWR": "powiat wrzesiński", "PZL": "powiat złotowski", "MZL": "powiat złotowski",
-                                         "RK": "Krosno", "YK": "Krosno", "RP": "Przemyśl", "YP": "Przemyśl", "RZ": "Rzeszów", "YZ": "Rzeszów",
-                                         "RT": "Tarnobrzeg", "YT": "Tarnobrzeg", "RBI": "powiat bieszczadzki", "YBI": "powiat bieszczadzki",
-                                         "RBR": "powiat brzozowski", "YBR": "powiat brzozowski", "RDE": "powiat dębicki", "YDE": "powiat dębicki",
-                                         "RJA": "powiat jarosławski", "YJA": "powiat jarosławski", "RJS": "powiat jasielski", "YJS": "powiat jasielski",
-                                         "RKL": "powiat kolbuszowski", "YKL": "powiat kolbuszowski", "RKR": "powiat krośnieński", "YKR": "powiat krośnieński",
-                                         "RLS": "powiat leski", "YLS": "powiat leski", "RLE": "powiat leżajski", "YLE": "powiat leżajski",
-                                         "RLU": "powiat lubaczowski", "YLU": "powiat lubaczowski", "RMI": "powiat mielecki", "YMI": "powiat mielecki",
-                                         "RNI": "powiat niżański", "YNI": "powiat niżański", "RPR": "powiat przemyski", "YPR": "powiat przemyski",
-                                         "RPZ": "powiat przeworski", "YPZ": "powiat przeworski", "RRS": "powiat ropczycko-sędziszowski", "YRS": "powiat ropczycko-sędziszowski",
-                                         "RZE": "powiat rzeszowski", "RZZ": "powiat rzeszowski", "RZR": "powiat rzeszowski", "YZE": "powiat rzeszowski", "YZZ": "powiat rzeszowski", "YZR": "powiat rzeszowski", "RSA": "powiat sanocki", "YSA": "powiat sanocki", "RST": "powiat stalowowolski", "YST": "powiat stalowowolski",
-                                         "RSR": "powiat strzyżowski", "YSR": "powiat strzyżowski", "RTA": "powiat tarnobrzeski", "YTA": "powiat tarnobrzeski",
-                                         "RLA": "powiat łańcucki", "YLA": "powiat łańcucki", "SB": "Bielsko-Biała", "IB": "Bielsko-Biała",
-                                         "SY": "Bytom", "IY": "Bytom", "SH": "Chorzów", "IH": "Chorzów", "SC": "Częstochowa", "IC": "Częstochowa",
-                                         "SD": "Dąbrowa Górnicza", "ID": "Dąbrowa Górnicza", "SG": "Gliwice", "IG": "Gliwice", "SJZ": "Jastrzębie-Zdrój", "IJZ": "Jastrzębie-Zdrój",
-                                         "SJ": "Jaworzno", "IJ": "Jaworzno", "SK": "Katowice", "IK": "Katowice", "SM": "Mysłowice", "IM": "Mysłowice",
-                                         "SPI": "Piekary Śląskie", "IPI": "Piekary Śląskie", "SL": "Ruda Śląska", "SRS": "Ruda Śląska", "IL": "Ruda Śląska", "IRS": "Ruda Śląska",
-                                         "SR": "Rybnik", "IR": "Rybnik", "SI": "Siemianowice Śląskie", "II": "Siemianowice Śląskie", "SO": "Sosnowiec", "IO": "Sosnowiec",
-                                         "SW": "Świętochłowice", "IW": "Świętochłowice", "ST": "Tychy", "IT": "Tychy", "SZ": "Zabrze", "IZ": "Zabrze", "SZO": "Żory", "IZO": "Żory",
-                                         "SBE": "powiat będziński", "SE": "powiat będziński", "SBN": "powiat będziński", "IBE": "powiat będziński", "IE": "powiat będziński", "IBN": "powiat będziński", "SBI": "powiat bielski", "IBI": "powiat bielski", "SBL": "powiat bieruńsko-lędziński", "IBL": "powiat bieruńsko-lędziński", "SCI": "powiat cieszyński", "SCN": "powiat cieszyński", "ICI": "powiat cieszyński", "ICN": "powiat cieszyński",
-                                         "SCZ": "powiat częstochowski", "ICZ": "powiat częstochowski", "SGL": "powiat gliwicki", "IGL": "powiat gliwicki",
-                                         "SKL": "powiat kłobucki", "IKL": "powiat kłobucki", "SLU": "powiat lubliniecki", "ILU": "powiat lubliniecki",
-                                         "SMI": "powiat mikołowski", "IMI": "powiat mikołowski", "SMY": "powiat myszkowski", "IMY": "powiat myszkowski",
-                                         "SPS": "powiat pszczyński", "IPS": "powiat pszczyński", "SRC": "powiat raciborski", "IRC": "powiat raciborski",
-                                         "SRB": "powiat rybnicki", "IRB": "powiat rybnicki", "STA": "powiat tarnogórski", "ITA": "powiat tarnogórski",
-                                         "IWD": "powiat wodzisławski", "IWZ": "powiat wodzisławski", "SWD": "powiat wodzisławski", "SWZ": "powiat wodzisławski",
-                                         "SZA": "powiat zawierciański", "IZA": "powiat zawierciański", "SZY": "powiat żywiecki", "IZY": "powiat żywiecki",
-                                         "TK": "Kielce", "TBU": "powiat buski", "TJE": "powiat jędrzejowski", "TKA": "powiat kazimierski", "TKI": "powiat kielecki",
-                                         "TKN": "powiat konecki", "TOP": "powiat opatowski", "TOS": "powiat ostrowiecki", "TPI": "powiat pińczowski",
-                                         "TSA": "powiat sandomierski", "TSK": "powiat skarżyski", "TST": "powiat starachowicki", "TSZ": "powiat staszowski",
-                                         "TLW": "powiat włoszczowski", "WO": "Ostrołęka", "AO": "Ostrołęka", "WP": "Płock", "AP": "Płock", "WR": "Radom", "AR": "Radom",
-                                         "WS": "Siedlce", "AS": "Siedlce", "WB": "Warszawa Bemowo", "AB": "Warszawa Bemowo",
-                                         "WA": "Warszawa Białołęka", "AA": "Warszawa Białołęka", "WD": "Warszawa Bielany", "AD": "Warszawa Bielany",
-                                         "WE": "Warszawa Mokotów", "AE": "Warszawa Mokotów", "WU": "Warszawa Ochota", "AU": "Warszawa Ochota",
-                                         "WH": "Warszawa Praga Północ", "AH": "Warszawa Praga Północ", "WF": "Warszawa Praga Południe", "AF": "Warszawa Praga Południe",
-                                         "WI": "Warszawa Śródmieście", "AI": "Warszawa Śródmieście", "WJ": "Warszawa Targówek", "AJ": "Warszawa Targówek",
-                                         "WK": "Warszawa Ursus", "AK": "Warszawa Ursus", "WN": "Warszawa Ursynów", "AN": "Warszawa Ursynów",
-                                         "WT": "Warszawa Wawer", "AT": "Warszawa Wawer", "WBR": "powiat białobrzeski", "ABR": "powiat białobrzeski",
-                                         "WCI": "powiat ciechanowski", "ACI": "powiat ciechanowski", "WG": "powiat garwoliński", "AG": "powiat garwoliński",
-                                         "WGS": "powiat gostyniński", "AGS": "powiat gostyniński", "WGM": "powiat grodziski", "AGM": "powiat grodziski",
-                                         "WGR": "powiat grójecki", "AGR": "powiat grójecki", "WKZ": "powiat kozienicki", "AKZ": "powiat kozienicki",
-                                         "WL": "powiat legionowski", "AL": "powiat legionowski", "WLI": "powiat lipski", "ALI": "powiat lipski",
-                                         "WMA": "powiat makowski", "AMA": "powiat makowski", "WM": "powiat miński", "AM": "powiat miński",
-                                         "WML": "powiat mławski", "AML": "powiat mławski", "WND": "powiat nowodworski", "AND": "powiat nowodworski",
-                                         "WOR": "powiat ostrowski", "AOR": "powiat ostrowski", "WOS": "powiat ostrołęcki", "AOS": "powiat ostrołęcki",
-                                         "WOT": "powiat otwocki", "AOT": "powiat otwocki", "WPI": "powiat piaseczyński", "WPA": "powiat piaseczyński", "WPW": "powiat piaseczyński", "WPX": "powiat piaseczyński", "API": "powiat piaseczyński", "APA": "powiat piaseczyński", "APW": "powiat piaseczyński", "APX": "powiat piaseczyński", "WPS": "powiat pruszkowski", "WPR": "powiat pruszkowski", "WPP": "powiat pruszkowski",
-                                         "APS": "powiat pruszkowski", "APR": "powiat pruszkowski", "APP": "powiat pruszkowski",
-                                         "WPZ": "powiat przasnyski", "APZ": "powiat przasnyski", "WPY": "powiat przysuski", "APY": "powiat przysuski",
-                                         "WPU": "powiat pułtuski", "APU": "powiat pułtuski", "WPL": "powiat płocki", "APL": "powiat płocki",
-                                         "WPN": "powiat płoński", "APN": "powiat płoński", "WRA": "powiat radomski", "ARA": "powiat radomski",
-                                         "WSI": "powiat siedlecki", "ASI": "powiat siedlecki", "WSE": "powiat sierpecki", "ASE": "powiat sierpecki",
-                                         "WSC": "powiat sochaczewski", "ASC": "powiat sochaczewski", "WSK": "powiat sokołowski", "ASK": "powiat sokołowski",
-                                         "WSZ": "powiat szydłowiecki", "ASZ": "powiat szydłowiecki", "WZ": "powiat warszawski zachodni", "AZ": "powiat warszawski zachodni",
-                                         "WWE": "powiat węgrowski", "AWE": "powiat węgrowski", "WWL": "powiat wołomiński", "AWL": "powiat wołomiński",
-                                         "WV": "powiat wołomiński", "AV": "powiat wołomiński", "WWY": "powiat wyszkowski", "AWY": "powiat wyszkowski",
-                                         "WZU": "powiat żuromiński", "AZU": "powiat żuromiński", "WZW": "powiat zwoleński", "AZW": "powiat zwoleński",
-                                         "WZY": "powiat żyrardowski", "AZY": "powiat żyrardowski", "WLS": "powiat łosicki", "ALS": "powiat łosicki",
-                                         "ZK": "Koszalin", "ZSW": "Świnoujście", "ZS": "Szczecin", "ZZ": "Szczecin", "ZBI": "powiat białogardzki",
-                                         "ZCH": "powiat choszczeński", "ZDR": "powiat drawski", "ZGL": "powiat goleniowski", "ZGY": "powiat gryficki",
-                                         "ZGR": "powiat gryfiński", "ZKA": "powiat kamieński", "ZKO": "powiat koszaliński", "ZKL": "powiat kołobrzeski",
-                                         "ZMY": "powiat myśliborski", "ZPL": "powiat policki", "ZPY": "powiat pyrzycki", "ZST": "powiat stargardzki",
-                                         "ZSD": "powiat świdwiński", "ZSZ": "powiat szczecinecki", "ZSL": "powiat sławieński", "ZWA": "powiat wałecki",
-                                         "ZLO": "powiat łobeski"}
-
         numer_tablicy = self.entry.get().upper()
 
         if numer_tablicy.startswith("W") and numer_tablicy[1:].isdigit() and len(numer_tablicy) == 7:
@@ -755,7 +808,6 @@ class Tablice(tk.Toplevel):
                 else:
                     self.result_label.config(
                         text=f"Przynależność: {polskie_tablice_rejestracyjne[znaki]}")
-
             else:
                 self.result_label.config(
                     text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
@@ -787,9 +839,158 @@ class Tablice(tk.Toplevel):
             else:
                 self.result_label.config(
                     text="Brak informacji dla tego rodzaju tablicy rejestracyjnej.")
-
         else:
             self.result_label.config(text="Nieznany format numeru tablicy.")
+
+    def dyplomaci(self):
+        self.window = Toplevel()
+        self.window.title("TABLICE DYPLOMATYCZNE")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Kraj", "Numer"), show="headings")
+        self.table.heading("Kraj", text="Kraj")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Kraj", width=180)
+        self.table.column("Numer", width=50)
+
+        for numer, kraj in tablice_dyplomatyczne_kraj.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
+        
+    def wojsko(self):
+        self.window = Toplevel()
+        self.window.title("SIŁY ZBROJNE RP")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Przeznaczenie sprzętu", "Numer"), show="headings")
+        self.table.heading("Przeznaczenie sprzętu", text="Przeznaczenie sprzętu")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Przeznaczenie sprzętu", width=180)
+        self.table.column("Numer", width=80)
+
+        for numer, kraj in wojsko.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
+
+    def kontrola_skarbowa(self):
+        self.window = Toplevel()
+        self.window.title("KONTROLA SKARBOWA")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Przynależność", "Numer"), show="headings")
+        self.table.heading("Przynależność", text="Przynależność")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Przynależność", width=180)
+        self.table.column("Numer", width=80)
+
+        for numer, kraj in kontrola_skarbowa.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
+
+    def sluzba_celna(self):
+        self.window = Toplevel()
+        self.window.title("SŁUŻBA CELNA")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Przynależność", "Numer"), show="headings")
+        self.table.heading("Przynależność", text="Przynależność")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Przynależność", width=180)
+        self.table.column("Numer", width=80)
+
+        for numer, kraj in sluzba_celna.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
+
+    def policja(self):
+        self.window = Toplevel()
+        self.window.title("POLICJA")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Przynależność", "Numer"), show="headings")
+        self.table.heading("Przynależność", text="Przynależność")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Przynależność", width=180)
+        self.table.column("Numer", width=80)
+
+        for numer, kraj in policja.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
+        
+    def inne_sluzby(self):
+        self.window = Toplevel()
+        self.window.title("INNE SŁUŻBY")
+        self.window.resizable(True, True)
+
+        self.frame = ttk.Frame(self.window, padding=5)
+        self.frame.pack(fill="both", expand=True)
+
+        self.table = ttk.Treeview(self.frame, columns=(
+            "Przynależność", "Numer"), show="headings")
+        self.table.heading("Przynależność", text="Przynależność")
+        self.table.heading("Numer", text="Numer")
+
+        self.table.column("Przynależność", width=180)
+        self.table.column("Numer", width=80)
+
+        for numer, kraj in inne_sluzby.items():
+            self.table.insert("", "end", values=(kraj, numer))
+
+        self.scroll = ttk.Scrollbar(
+            self.frame, orient="vertical", command=self.table.yview)
+        self.table.configure(yscroll=self.scroll.set)
+        self.scroll.pack(side="right", fill="y")
+        self.table.pack(fill="both", expand=True)
 
     def show_page(self, page):
         if self.current_page:
@@ -816,6 +1017,7 @@ class DietyKrajowe(tk.Toplevel):
         self.strona_druga()
         self.strona_trzecia()
         self.strona_czwarta()
+        self.strona_piata()
 
         self.show_page(self.page1)
 
@@ -941,32 +1143,10 @@ class DietyKrajowe(tk.Toplevel):
         self.label_kolacja.grid(row=3, column=2, sticky=E, padx=5, pady=5)
         self.ilosc_kolacjadk = Entry(self.page3, width=5, state=DISABLED)
         self.ilosc_kolacjadk.grid(row=3, column=3, sticky=W, padx=5, pady=5)
-
-        self.label_dodatki = Label(
-            self.page3, text="Wskaż przysługujące ci ryczałty")
-        self.label_dodatki.grid(
-            row=4, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
-
-        self.nocleg_var1 = tk.BooleanVar()
-        self.auto_var2 = tk.BooleanVar()
-        self.komunikacja_var3 = tk.BooleanVar()
-
-        self.checkframe = Frame(self.page3)
-        self.checkframe.grid(row=5, column=0, columnspan=8)
-
-        self.check_nocleg = Checkbutton(
-            self.checkframe, text="NOCLEG", variable=self.nocleg_var1, command=self.rycz_nocleg)
-        self.check_auto = Checkbutton(
-            self.checkframe, text="PRYWATNE AUTO", variable=self.auto_var2, command=self.rycz_auto)
-        self.check_komunikacja = Checkbutton(
-            self.checkframe, text="KOMUNIKACJA MIEJSCOWA", variable=self.komunikacja_var3, command=self.rycz_komunikacja)
-        self.check_nocleg.grid(row=0, column=0, padx=5, pady=5, sticky=W)
-        self.check_auto.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-        self.check_komunikacja.grid(row=2, column=0, padx=5, pady=5, sticky=W)
-
+        
         self.button_container = tk.Frame(self.page3)
         self.button_container.grid(
-            row=8, column=0, padx=5, pady=5, columnspan=8)
+            row=4, column=0, padx=5, pady=5, columnspan=8)
 
         self.button_back_page2 = tk.Button(
             self.button_container, text="WSTECZ", command=self.back_page3)
@@ -981,17 +1161,57 @@ class DietyKrajowe(tk.Toplevel):
         self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
 
     def strona_czwarta(self):
-        self.page4 = tk.Frame(self)
+        self.page4= tk.Frame(self)
 
-        button_container = tk.Frame(self.page4)
+        self.label_dodatki = Label(
+            self.page4, text="Wskaż przysługujące ci ryczałty")
+        self.label_dodatki.grid(
+            row=0, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+
+        self.nocleg_var1 = tk.BooleanVar()
+        self.auto_var2 = tk.BooleanVar()
+        self.komunikacja_var3 = tk.BooleanVar()
+
+        self.checkframe = Frame(self.page4)
+        self.checkframe.grid(row=1, column=0, columnspan=8)
+
+        self.check_nocleg = Checkbutton(
+            self.checkframe, text="NOCLEG", variable=self.nocleg_var1, command=self.rycz_nocleg)
+        self.check_auto = Checkbutton(
+            self.checkframe, text="PRYWATNE AUTO", variable=self.auto_var2, command=self.rycz_auto)
+        self.check_komunikacja = Checkbutton(
+            self.checkframe, text="KOMUNIKACJA MIEJSCOWA", variable=self.komunikacja_var3, command=self.rycz_komunikacja)
+        self.check_nocleg.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+        self.check_auto.grid(row=1, column=0, padx=5, pady=5, sticky=W)
+        self.check_komunikacja.grid(row=2, column=0, padx=5, pady=5, sticky=W)
+        
+        self.button_container = tk.Frame(self.page4)
+        self.button_container.grid(row=2, column=0, padx=5, pady=5, columnspan=8)
+
+        self.button_back_page2 = tk.Button(
+            self.button_container, text="WSTECZ", command=self.back_page4)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
+
+        self.back_button = tk.Button(
+            self.button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.button_next_page2 = tk.Button(
+            self.button_container, text="DALEJ", command=self.next_page4)
+        self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
+
+    def strona_piata(self):
+        self.page5 = tk.Frame(self)
+
+        button_container = tk.Frame(self.page5)
         button_container.grid(row=1, column=0, padx=5, pady=5, columnspan=8)
 
-        self.label_wynik = Label(self.page4)
+        self.label_wynik = Label(self.page5)
         self.label_wynik.grid(row=0, column=0, padx=5,
                               pady=5, columnspan=8, sticky=W)
 
         self.button_back_page2 = tk.Button(
-            button_container, text="WSTECZ", command=self.back_page4)
+            button_container, text="WSTECZ", command=self.back_page5)
         self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
@@ -1048,13 +1268,13 @@ class DietyKrajowe(tk.Toplevel):
             option_var = tk.DoubleVar()
 
             option1 = Radiobutton(self.top, text="Auto z silnikiem o poj. do 900 cm3",
-                                variable=option_var, value=self.auto_do_900)
+                                  variable=option_var, value=self.auto_do_900)
             option2 = Radiobutton(self.top, text="Auto z silnikiem o poj. ponad 900 cm3",
-                                variable=option_var, value=self.auto_ponad_900)
+                                  variable=option_var, value=self.auto_ponad_900)
             option3 = Radiobutton(self.top, text="Motocykl",
-                                variable=option_var, value=self.motocykl)
+                                  variable=option_var, value=self.motocykl)
             option4 = Radiobutton(self.top, text="Motorower",
-                                variable=option_var, value=self.motorower)
+                                  variable=option_var, value=self.motorower)
             option1.pack(padx=10, pady=5)
             option2.pack(padx=10, pady=5)
             option3.pack(padx=10, pady=5)
@@ -1074,11 +1294,12 @@ class DietyKrajowe(tk.Toplevel):
                     messagebox.showerror(
                         "Wystąpił błąd", "Aby przejść dalej musisz wybrać środek transportu.")
 
-            submit_button = tk.Button(self.top, text="POTWIERDŹ", command=submit)
+            submit_button = tk.Button(
+                self.top, text="POTWIERDŹ", command=submit)
             submit_button.pack(padx=10, pady=10)
         else:
             pass
-        
+
     def rycz_komunikacja(self):
         try:
             s_rok = int(self.cal_start.get_date()[-4:])
@@ -1198,7 +1419,7 @@ class DietyKrajowe(tk.Toplevel):
         if self.nocleg_var1.get():
             self.ryczalt_nocleg
             ryc_noc_info = (
-                f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} PLN.")
+                f"Za ryczałt za nocleg należy doliczyć {round(self.ryczalt_nocleg,2)} PLN.")
         else:
             self.ryczalt_nocleg = 0
             ryc_noc_info = ("")
@@ -1206,7 +1427,7 @@ class DietyKrajowe(tk.Toplevel):
         if self.auto_var2.get():
             self.ryczalt_auto
             ryc_auto_info = (
-                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} PLN.")
+                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy doliczyć {round(self.ryczalt_auto,2)} PLN.")
         else:
             self.ryczalt_auto = 0
             ryc_auto_info = ("")
@@ -1214,16 +1435,22 @@ class DietyKrajowe(tk.Toplevel):
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
             ryc_kom_info = (
-                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} PLN.")
+                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy doliczyć {round(self.ryczalt_komunikacja,2)} PLN.")
         else:
             self.ryczalt_komunikacja = 0
             ryc_kom_info = ("")
 
         zarcie = sniadanie + obiad + kolacja
+        dieta = nalezna_dieta_dzien + nalezna_dieta_godz
+        dieta_bez_posilkow = dieta - zarcie
 
         if zarcie != 0:
             zarcie_info = (
-                f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.")
+                f"""Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.
+                - {self.ilosc_sniadaniedk.get()}x śniadanie = {sniadanie} PLN
+                - {self.ilosc_obiaddk.get()}x obiad = {obiad} PLN
+                - {self.ilosc_kolacjadk.get()}x kolacja = {kolacja} PLN
+                Po odjęciu posiłków dieta wynosi {dieta_bez_posilkow} PLN.""")
         else:
             zarcie_info = ("")
 
@@ -1254,7 +1481,12 @@ class DietyKrajowe(tk.Toplevel):
             self.nocleg_var1.get()
 
         if dodatki != 0:
-            result = (f"""Delegacja krajowa trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
+            result = (f"""
+                Start delegacji: {data_startu}
+                Koniec delegacji: {data_konca}\n
+                Delegacja trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}.
+                Przysługuje Ci za to {round(dieta,2)} PLN.
+                ({round(nalezna_dieta_dzien,2)} PLN za pełne dni + {round(nalezna_dieta_godz,2)} PLN reszta)\n
                 {zarcie_info}
                 {ryc_noc_info}
                 {ryc_kom_info}
@@ -1263,7 +1495,9 @@ class DietyKrajowe(tk.Toplevel):
                 """)
         else:
             result = (f"""
-                Delegacja krajowa trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
+                Start delegacji: {data_startu}
+                Koniec delegacji: {data_konca}\n
+                Delegacja trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
                 Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
                 """)
 
@@ -1279,13 +1513,15 @@ class DietyKrajowe(tk.Toplevel):
         try:
             godziny_startu = int(self.wybor_godziny_startu.get())
             minuty_startu = int(self.wybor_minuty_startu.get())
-            
+
             if not (godziny_startu <= 23) or not (minuty_startu <= 59):
-                messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
+                messagebox.showerror(
+                    "Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page2)
         except ValueError:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
 
     def back_page2(self):
         self.show_page(self.page1)
@@ -1294,26 +1530,32 @@ class DietyKrajowe(tk.Toplevel):
         try:
             godziny_konca = int(self.wybor_godziny_konca.get())
             minuty_konca = int(self.wybor_minuty_konca.get())
-            
+
             if not (godziny_konca <= 23) or not (minuty_konca <= 59):
-                messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
+                messagebox.showerror(
+                    "Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page3)
         except ValueError:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.") 
-            
-    def next_page3(self):       
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
+
+    def next_page3(self):
         if (self.ilosc_sniadaniedk.get().isdigit() or self.ilosc_sniadaniedk.get() == "") and (self.ilosc_obiaddk.get().isdigit() or self.ilosc_obiaddk.get() == "") and (self.ilosc_kolacjadk.get().isdigit() or self.ilosc_kolacjadk.get() == ""):
-            self.licz_diete()
-            self.next_page4()
+            self.show_page(self.page4)
         else:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")  
-                 
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
+
     def next_page4(self):
-        self.show_page(self.page4)
+        self.licz_diete()
+        self.show_page(self.page5)
 
     def back_page4(self):
         self.show_page(self.page3)
+
+    def back_page5(self):
+        self.show_page(self.page4)
 
     def back_page3(self):
         self.show_page(self.page2)
@@ -1338,6 +1580,8 @@ class DietyZagraniczne(tk.Toplevel):
         self.strona_druga()
         self.strona_trzecia()
         self.strona_czwarta()
+        self.strona_piata()
+        self.strona_szosta()
 
         self.show_page(self.page1)
 
@@ -1494,36 +1738,6 @@ class DietyZagraniczne(tk.Toplevel):
         self.zilosc_kolacja = Entry(self.page3, width=5, state=DISABLED)
         self.zilosc_kolacja.grid(row=3, column=3, sticky=W, padx=5, pady=5)
 
-        self.label_dodatki = Label(
-            self.page3, text="Wskaż przysługujące ci ryczałty")
-        self.label_dodatki.grid(
-            row=4, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
-
-        self.nocleg_var1 = tk.BooleanVar()
-        self.auto_var2 = tk.BooleanVar()
-        self.komunikacja_var3 = tk.BooleanVar()
-        self.dojazd_do_var4 = tk.BooleanVar()
-        self.dojazd_z_var5 = tk.BooleanVar()
-
-        self.checkframe = Frame(self.page3)
-        self.checkframe.grid(row=5, column=0, columnspan=8)
-
-        self.check_nocleg = Checkbutton(
-            self.checkframe, text="NOCLEG", variable=self.nocleg_var1, command=self.rycz_nocleg)
-        self.check_auto = Checkbutton(
-            self.checkframe, text="PRYWATNE AUTO", variable=self.auto_var2, command=self.rycz_auto)
-        self.check_komunikacja = Checkbutton(
-            self.checkframe, text="KOMUNIKACJA MIEJSCOWA", variable=self.komunikacja_var3, command=self.rycz_komunikacja)
-        self.check_dojazd_do = Checkbutton(
-            self.checkframe, text="DOJAZD DO LOTNISKA", variable=self.dojazd_do_var4, command=self.rycz_dojazd_do)
-        self.check_dojazd_z = Checkbutton(
-            self.checkframe, text="DOJAZD Z LOTNISKA", variable=self.dojazd_z_var5, command=self.rycz_dojazd_z)
-        self.check_nocleg.grid(row=0, column=0, padx=5, pady=5, sticky=W)
-        self.check_auto.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-        self.check_komunikacja.grid(row=2, column=0, padx=5, pady=5, sticky=W)
-        self.check_dojazd_do.grid(row=3, column=0, padx=5, pady=5, sticky=W)
-        self.check_dojazd_z.grid(row=4, column=0, padx=5, pady=5, sticky=W)
-
         self.button_container = tk.Frame(self.page3)
         self.button_container.grid(
             row=8, column=0, padx=5, pady=5, columnspan=8)
@@ -1542,15 +1756,102 @@ class DietyZagraniczne(tk.Toplevel):
 
     def strona_czwarta(self):
         self.page4 = tk.Frame(self)
+        self.label_dodatki = Label(
+            self.page4, text="Wskaż przysługujące ci ryczałty")
+        self.label_dodatki.grid(
+            row=4, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
 
-        self.zlabel_wynik = Label(self.page4)
+        self.nocleg_var1 = tk.BooleanVar()
+        self.auto_var2 = tk.BooleanVar()
+        self.komunikacja_var3 = tk.BooleanVar()
+        self.dojazd_do_var4 = tk.BooleanVar()
+        self.dojazd_z_var5 = tk.BooleanVar()
+
+        self.checkframe = Frame(self.page4)
+        self.checkframe.grid(row=5, column=0, columnspan=8)
+
+        self.check_nocleg = Checkbutton(
+            self.checkframe, text="NOCLEG", variable=self.nocleg_var1, command=self.rycz_nocleg)
+        self.check_auto = Checkbutton(
+            self.checkframe, text="PRYWATNE AUTO", variable=self.auto_var2, command=self.rycz_auto)
+        self.check_komunikacja = Checkbutton(
+            self.checkframe, text="KOMUNIKACJA MIEJSCOWA", variable=self.komunikacja_var3, command=self.rycz_komunikacja)
+        self.check_dojazd_do = Checkbutton(
+            self.checkframe, text="DOJAZD DO LOTNISKA", variable=self.dojazd_do_var4, command=self.rycz_dojazd_do)
+        self.check_dojazd_z = Checkbutton(
+            self.checkframe, text="DOJAZD Z LOTNISKA", variable=self.dojazd_z_var5, command=self.rycz_dojazd_z)
+        self.check_nocleg.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+        self.check_auto.grid(row=1, column=0, padx=5, pady=5, sticky=W)
+        self.check_komunikacja.grid(row=2, column=0, padx=5, pady=5, sticky=W)
+        self.check_dojazd_do.grid(row=3, column=0, padx=5, pady=5, sticky=W)
+        self.check_dojazd_z.grid(row=4, column=0, padx=5, pady=5, sticky=W)
+        
+        self.button_container = tk.Frame(self.page4)
+        self.button_container.grid(row=5, column=0, padx=5, pady=5, columnspan=8)
+        
+        self.button_back_page2 = tk.Button(
+            self.button_container, text="WSTECZ", command=self.back_page4)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
+
+        self.back_button = tk.Button(
+            self.button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.button_next_page2 = tk.Button(
+            self.button_container, text="DALEJ", command=self.next_page4)
+        self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
+        
+    def strona_piata(self):
+        self.page5 = tk.Frame(self)
+
+        self.label_naleznosc = Label(
+            self.page5, text="Wskaż wysokość przysługującej Ci należności")
+        self.label_naleznosc.grid(row=0, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+        
+        self.wybor_naleznosc = tk.StringVar()
+        self.wybor_naleznosc.set("0")
+
+        option1 = tk.Radiobutton(self.page5, text="0%", variable=self.wybor_naleznosc, value="0")
+        option1.grid(row=1, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+
+        option2 = tk.Radiobutton(self.page5, text="25%", variable=self.wybor_naleznosc, value="0.25")
+        option2.grid(row=2, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+
+        option3 = tk.Radiobutton(self.page5, text="50%", variable=self.wybor_naleznosc, value="0.5")
+        option3.grid(row=3, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+
+        option4 = tk.Radiobutton(self.page5, text="75%", variable=self.wybor_naleznosc, value="0.75")
+        option4.grid(row=4, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+        
+        option5 = tk.Radiobutton(self.page5, text="100%", variable=self.wybor_naleznosc, value="1")
+        option5.grid(row=5, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+        
+        self.button_container = tk.Frame(self.page5)
+        self.button_container.grid(row=6, column=0, padx=5, pady=5, columnspan=8)
+        
+        self.button_back_page2 = tk.Button(
+            self.button_container, text="WSTECZ", command=self.back_page5)
+        self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
+
+        self.back_button = tk.Button(
+            self.button_container, text="POWRÓT DO MENU", command=self.back_to_menu)
+        self.back_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.button_next_page2 = tk.Button(
+            self.button_container, text="DALEJ", command=self.next_page5)
+        self.button_next_page2.grid(row=0, column=2, sticky=W, padx=5, pady=5)
+
+    def strona_szosta(self):
+        self.page6 = tk.Frame(self)
+
+        self.zlabel_wynik = Label(self.page6)
         self.zlabel_wynik.grid(row=0, column=0, padx=5, pady=5, columnspan=8)
 
-        button_container = tk.Frame(self.page4)
+        button_container = tk.Frame(self.page6)
         button_container.grid(row=1, column=0, padx=5, pady=5, columnspan=8)
 
         self.button_back_page2 = tk.Button(
-            button_container, text="WSTECZ", command=self.back_page4)
+            button_container, text="WSTECZ", command=self.back_page6)
         self.button_back_page2.grid(row=0, column=0, sticky=E, padx=5, pady=5)
 
         self.back_button = tk.Button(
@@ -1659,13 +1960,13 @@ class DietyZagraniczne(tk.Toplevel):
             option_var = tk.DoubleVar()
 
             option1 = Radiobutton(self.top, text="Auto z silnikiem o poj. do 900 cm3",
-                                variable=option_var, value=self.auto_do_900)
+                                  variable=option_var, value=self.auto_do_900)
             option2 = Radiobutton(self.top, text="Auto z silnikiem o poj. ponad 900 cm3",
-                                variable=option_var, value=self.auto_ponad_900)
+                                  variable=option_var, value=self.auto_ponad_900)
             option3 = Radiobutton(self.top, text="Motocykl",
-                                variable=option_var, value=self.motocykl)
+                                  variable=option_var, value=self.motocykl)
             option4 = Radiobutton(self.top, text="Motorower",
-                                variable=option_var, value=self.motorower)
+                                  variable=option_var, value=self.motorower)
             option1.pack(padx=10, pady=5)
             option2.pack(padx=10, pady=5)
             option3.pack(padx=10, pady=5)
@@ -1685,7 +1986,8 @@ class DietyZagraniczne(tk.Toplevel):
                     messagebox.showerror(
                         "Wystąpił błąd", "Aby przejść dalej musisz wybrać środek transportu.")
 
-            submit_button = tk.Button(self.top, text="POTWIERDŹ", command=submit)
+            submit_button = tk.Button(
+                self.top, text="POTWIERDŹ", command=submit)
             submit_button.pack(padx=10, pady=10)
         else:
             pass
@@ -1752,7 +2054,7 @@ class DietyZagraniczne(tk.Toplevel):
         except ValueError:
             info = ("Wprowadzono złą wartość godziny i/lub minuty")
             self.zlabel_wynik.config(text=info)
-            
+
         data_startu = datetime(s_rok, s_miesiac, s_dzien, s_godzina, s_minuta)
         data_konca = datetime(k_rok, k_miesiac, k_dzien, k_godzina, k_minuta)
         czas_delegacji = data_konca - data_startu
@@ -1771,12 +2073,16 @@ class DietyZagraniczne(tk.Toplevel):
 
         if liczba_godzin == 0:
             nalezna_dieta_godz = 0
+            wysokosc_stawki = "0"
         if 0 < liczba_godzin < 8:
             nalezna_dieta_godz = dieta/3
+            wysokosc_stawki = "1/3"
         if 8 <= liczba_godzin < 12:
             nalezna_dieta_godz = dieta * 0.5
+            wysokosc_stawki = "1/2"
         if liczba_godzin >= 12:
             nalezna_dieta_godz = dieta
+            wysokosc_stawki = "0"
 
         try:
             sniadanie = int(self.zilosc_sniadanie.get()) * (dieta * 0.15)
@@ -1796,7 +2102,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.nocleg_var1.get():
             self.ryczalt_nocleg
             ryc_noc_info = (
-                f"Za ryczałt za nocleg należy ci się dodatkowo {round(self.ryczalt_nocleg,2)} {omega}.")
+                f"Za ryczałt za nocleg należy doliczyć {round(self.ryczalt_nocleg,2)} {omega}.")
         else:
             self.ryczalt_nocleg = 0
             ryc_noc_info = ("")
@@ -1804,7 +2110,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.auto_var2.get():
             self.ryczalt_auto
             ryc_auto_info = (
-                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy ci się dodatkowo {round(self.ryczalt_auto,2)} {omega}.")
+                f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy doliczyć {round(self.ryczalt_auto,2)} {omega}.")
         else:
             self.ryczalt_auto = 0
             ryc_auto_info = ("")
@@ -1812,7 +2118,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
             ryc_kom_info = (
-                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy ci sie dodatkowo {round(self.ryczalt_komunikacja,2)} {omega}.")
+                f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy doliczyć {round(self.ryczalt_komunikacja,2)} {omega}.")
         else:
             self.ryczalt_komunikacja = 0
             ryc_kom_info = ("")
@@ -1820,7 +2126,7 @@ class DietyZagraniczne(tk.Toplevel):
         if self.dojazd_do_var4.get():
             self.ryczalt_dojazd_do
             ryc_dojazd_do = (
-                f"Za ryczałt za dojazd do lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_do,2)} {omega}.")
+                f"Za ryczałt za dojazd do lotniska należy doliczyć {round(self.ryczalt_dojazd_do,2)} {omega}.")
         else:
             self.ryczalt_dojazd_do = 0
             ryc_dojazd_do = ("")
@@ -1828,22 +2134,29 @@ class DietyZagraniczne(tk.Toplevel):
         if self.dojazd_z_var5.get():
             self.ryczalt_dojazd_z
             ryc_dojazd_z = (
-                f"Za ryczałt za dojazd z lotniska należy ci sie dodatkowo {round(self.ryczalt_dojazd_z,2)} {omega}.")
+                f"Za ryczałt za dojazd z lotniska należy doliczyć {round(self.ryczalt_dojazd_z,2)} {omega}.")
         else:
             self.ryczalt_dojazd_z = 0
             ryc_dojazd_z = ("")
 
         zarcie = sniadanie + obiad + kolacja
-
+        diet = nalezna_dieta_dzien + nalezna_dieta_godz
+        dieta_bez_posilkow = diet - zarcie
+        
         if zarcie != 0:
             zarcie_info = (
-                f"Za zapewnione posiłki należy odjąć {round(zarcie,2)} {omega}.")
+                f"""Za zapewnione posiłki należy odjąć {round(zarcie,2)} {omega}.
+                - {self.zilosc_sniadanie.get()}x śniadanie = {sniadanie} {omega}
+                - {self.zilosc_obiad.get()}x obiad = {obiad} {omega}
+                - {self.zilosc_kolacja.get()}x kolacja = {kolacja} {omega}
+                Po odjęciu posiłków dieta wynosi {dieta_bez_posilkow} {omega}.""")
         else:
             zarcie_info = ("")
 
         nalezna_dieta = nalezna_dieta_dzien + \
             nalezna_dieta_godz - sniadanie - obiad - kolacja + \
-            self.ryczalt_nocleg + self.ryczalt_komunikacja + self.ryczalt_auto
+            self.ryczalt_nocleg + self.ryczalt_komunikacja + \
+            self.ryczalt_auto + self.ryczalt_dojazd_z + self.ryczalt_dojazd_do
 
         if int(liczba_dni) == 1:
             wersja_dzien = "dzień"
@@ -1867,21 +2180,41 @@ class DietyZagraniczne(tk.Toplevel):
         dodatki = zarcie + self.dojazd_z_var5.get() + self.dojazd_do_var4.get() + \
             self.komunikacja_var3.get() + self.auto_var2.get() + self.nocleg_var1.get()
 
+        naleznosc = (nalezna_dieta_dzien + nalezna_dieta_godz)*(float(self.wybor_naleznosc.get()))
+
         if dodatki != 0:
             result = (f"""
-                Delegacja {gamma} trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} {omega} + {round(nalezna_dieta_godz,2)} {omega}).\n
+                Start delegacji: {data_startu}
+                Koniec delegacji: {data_konca}\n
+                Delegacja {gamma} trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}
+                Przysługuje Ci za to {round(diet,2)} {omega}.
+                ({round(nalezna_dieta_dzien,2)} {omega} za pełne dni + {round(nalezna_dieta_godz,2)} {omega} reszta)\n
                 {zarcie_info}
                 {ryc_noc_info}
                 {ryc_kom_info}
                 {ryc_auto_info}
                 {ryc_dojazd_do}
                 {ryc_dojazd_z}
-                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.
+                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.\n
+                ***N A L E Ż N O Ś Ć***\n
+                Przysługuje Ci {round(naleznosc,2)} {omega} należności.
+                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {nalezna_dieta_dzien} {omega}]
+                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {nalezna_dieta_godz} {omega}]
+                - razem [{diet} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
         else:
             result = (f"""
-                Delegacja {gamma} trwała \n{int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} {omega} + {round(nalezna_dieta_godz,2)} {omega}).\n
-                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.
+                Start delegacji: {data_startu}
+                Koniec delegacji: {data_konca}\n
+                Delegacja {gamma} trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}
+                Przysługuje Ci za to {round(diet,2)} {omega}.
+                ({round(nalezna_dieta_dzien,2)} {omega} za pełne dni + {round(nalezna_dieta_godz,2)} {omega} reszta)\n
+                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.\n
+                ***N A L E Ż N O Ś Ć***\n
+                Przysługuje Ci {round(naleznosc,2)} {omega} należności.
+                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {nalezna_dieta_dzien} {omega}]
+                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {nalezna_dieta_godz} {omega}]
+                - razem [{diet} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
 
         self.zlabel_wynik.config(text=result)
@@ -1914,13 +2247,15 @@ class DietyZagraniczne(tk.Toplevel):
         try:
             godziny_startu = int(self.zwybor_godziny_startu.get())
             minuty_startu = int(self.zwybor_minuty_startu.get())
-            
+
             if not (godziny_startu <= 23) or not (minuty_startu <= 59):
-                messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
+                messagebox.showerror(
+                    "Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page2)
         except ValueError:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
 
     def back_page2(self):
         self.show_page(self.page1)
@@ -1929,26 +2264,38 @@ class DietyZagraniczne(tk.Toplevel):
         try:
             godziny_konca = int(self.zwybor_godziny_konca.get())
             minuty_konca = int(self.zwybor_minuty_konca.get())
-            
+
             if not (godziny_konca <= 23) or not (minuty_konca <= 59):
-                messagebox.showerror("Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
+                messagebox.showerror(
+                    "Błąd", "Wprowadzono nieprawidłową wartość godzin lub minut")
             else:
                 self.show_page(self.page3)
         except ValueError:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.") 
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
 
-    def next_page3(self):       
+    def next_page3(self):
         if (self.zilosc_sniadanie.get().isdigit() or self.zilosc_sniadanie.get() == "") and (self.zilosc_obiad.get().isdigit() or self.zilosc_obiad.get() == "") and (self.zilosc_kolacja.get().isdigit() or self.zilosc_kolacja.get() == ""):
-            self.licz_diete_zagra()
             self.next_page4()
         else:
-            messagebox.showerror("Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")  
+            messagebox.showerror(
+                "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
 
     def next_page4(self):
-        self.show_page(self.page4)
+        self.show_page(self.page5)
 
     def back_page4(self):
         self.show_page(self.page3)
+        
+    def next_page5(self):
+        self.licz_diete_zagra()
+        self.show_page(self.page6)
+
+    def back_page5(self):
+        self.show_page(self.page4)
+    
+    def back_page6(self):
+        self.show_page(self.page5)
 
     def back_page3(self):
         self.show_page(self.page2)
@@ -2038,7 +2385,7 @@ class PESEL(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_close_window)
         self.current_page = None
         self.resizable(False, False)
-        self.geometry("300x350") 
+        self.geometry("350x350")
         self.strona_pierwsza()
 
         self.show_page(self.page1)
@@ -2192,9 +2539,17 @@ class PESEL(tk.Toplevel):
                                     state=DISABLED,
                                     compound=RIGHT)
         self.copy_button01.grid(row=0, column=2, padx=5, pady=5, sticky=W)
+        
+        self.save_button = Button(self.przycis_frame,
+                                    text="ZAPISZ",
+                                    command=self.save_to_file,
+                                    state=DISABLED,
+                                    compound=RIGHT)
+        self.save_button.grid(row=0, column=3, padx=5, pady=5, sticky=W)
 
         self.wynik_frame = Frame(self.tab3_check)
-        self.wynik_frame.grid(row=4, column=0, padx=5, pady=5, columnspan=3, sticky=W)
+        self.wynik_frame.grid(row=4, column=0, padx=5,
+                              pady=5, columnspan=3, sticky=W)
 
         self.Lab6 = Label(self.wynik_frame)
         self.Lab6.grid(row=0, column=0, padx=5, pady=5, sticky=W)
@@ -2284,13 +2639,13 @@ class PESEL(tk.Toplevel):
         self.page1.clipboard_clear()
         self.page1.clipboard_append(self.generated_pesel)
         info = "Wygenerowany PESEL skopiowano do pamięci podręcznej."
-        messagebox.showinfo("Sukces!",info)
+        messagebox.showinfo("Sukces!", info)
 
     def copy_result2(self):
         self.page1.clipboard_clear()
         self.page1.clipboard_append(self.generated_identity)
         info = "Wygenerowany tekst skopiowano do pamięci podręcznej."
-        messagebox.showinfo("Sukces!",info)
+        messagebox.showinfo("Sukces!", info)
 
     def generate_pesel(self):
         if self.man.get() == 0 and self.woman.get() == 0:
@@ -2386,6 +2741,25 @@ class PESEL(tk.Toplevel):
             f"""+48 {random.choice(start_numeru)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)} {random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)}""")
         return self.numer_telefonu
 
+    def id_number(self):
+        wartosci_liter = {
+            "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15, "G": 16, "H": 17, "I": 18,
+            "J": 19, "K": 20, "L": 21, "M": 22, "N": 23, "O": 24, "P": 25, "Q": 26, "R": 27,
+            "S": 28, "T": 29, "U": 30, "V": 31, "W": 32, "X": 33, "Y": 34, "Z": 35
+        }
+
+        while True:
+            seria = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=3))
+            numer = "".join(random.choices("0123456789", k=6))
+            self.numer_dowodu = seria + numer
+            
+            suma_seria = (int(wartosci_liter.get(seria[0]))*7) + (int(wartosci_liter.get(seria[1])*3)) + (int(wartosci_liter.get(seria[2])))
+            suma_numer = (int(numer[0])*9)+(int(numer[1])*7)+(int(numer[2])*3)+(int(numer[3]))+(int(numer[4])*7)+(int(numer[5])*3)
+            suma = int(suma_seria) + int(suma_numer)
+               
+            if suma % 10 == 0:
+                return self.numer_dowodu
+            
     def mail(self):
         skrzynka = ["gmail.com", "wp.pl", "o2.pl", "onet.eu",
                     "onet.pl", "interia.pl", "gazeta.pl", "proton.me"]
@@ -2482,17 +2856,20 @@ class PESEL(tk.Toplevel):
                 self.zodiaq()
                 self.telefon()
                 self.mail()
+                self.id_number()
                 self.generated_identity = (
                     "Wygenerowana tożsamość:\n"
                     f"{self.name} {self.last_name}\n"
                     f"{self.date_of_birth} {random.choice(self.cities)}\n"
                     f"PESEL: {self.generated_pesel}\n"
+                    f"Numer dowodu osobistego: {self.numer_dowodu}\n"
                     f"Znak zodiaku: {self.sign}\n"
                     f"Numer telefonu: {self.numer_telefonu}\n"
                     f"Adres mailowy: {self.adres_email}\n"
                 )
                 self.Lab6.config(text=self.generated_identity, anchor='w')
                 self.copy_button01.config(state=ACTIVE)
+                self.save_button.config(state=ACTIVE)
                 break
             if self.woman_opt.get() == 1:
                 self.name = random.choice(self.women_names)
@@ -2538,18 +2915,42 @@ class PESEL(tk.Toplevel):
                 self.zodiaq()
                 self.telefon()
                 self.mail()
+                self.id_number()
                 self.generated_identity = (
                     "Wygenerowana tożsamość:\n"
                     f"{self.name} {self.last_name}\n"
                     f"{self.date_of_birth} {random.choice(self.cities)}\n"
                     f"PESEL: {self.generated_pesel}\n"
+                    f"Numer dowodu osobistego: {self.numer_dowodu}\n"
                     f"Znak zodiaku: {self.sign}\n"
                     f"Numer telefonu: {self.numer_telefonu}\n"
                     f"Adres mailowy: {self.adres_email}\n"
                 )
                 self.Lab6.config(text=self.generated_identity)
                 self.copy_button01.config(state=ACTIVE)
+                self.save_button.config(state=ACTIVE)
                 break
+            
+    def get_unique_file_name(self, folder_path, file_name):
+        base, extension = os.path.splitext(file_name)
+        counter = 1
+        while os.path.exists(os.path.join(folder_path, file_name)):
+            file_name = f"{base}_{counter}{extension}"
+            counter += 1
+        return file_name
+
+    def save_to_file(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Pliki tekstowe", "*.txt")])
+        if file_path:
+            try:
+                with open(file_path, 'w') as file:
+                    file.write(str(self.generated_identity))
+                messagebox.showinfo('Śliwka Coding Center ©', 'Wygenerowana tożsamość została zapisana do pliku')
+            except Exception as e:
+                messagebox.showerror('Śliwka Coding Center ©', 'Wystąpił błąd podczas zapisywania pliku')
+                print("Wystąpił błąd podczas zapisywania pliku:", e)
+        else:
+            messagebox.showinfo('Śliwka Coding Center ©', 'Anulowano zapis do pliku.')
 
     def show_page(self, page):
         if self.current_page:
@@ -2861,38 +3262,58 @@ class GeneratorHasel(tk.Toplevel):
         if self.check_special_characters.get() == 1:
             charset += self.special_chars
 
+        self.password = ""  # Resetowanie hasła
         self.generate_password(charset)
+        self.create_result(self.password)
+        self.check_passwd_power()
 
     def create_result(self, password):
         self.page1.clipboard_clear()
         self.page1.clipboard_append(password)
 
     def generate_password(self, charset):
+        self.password = ""  # Resetowanie hasła
         for _ in range(self.pass_len.get()):
             self.password += ''.join(secrets.choice(charset))
-        self.create_result(self.password)
-        self.check_passwd_power()
 
     def check_password_strength(self):
-        if len(self.password) < 8:
-            self.power = "Hasło jest za krótkie. Minimalna długość to 8 znaków."
-            return self.power
-        if len(set(self.password)) < 4:
-            self.power = "Hasło jest zbyt słabe. Powinno zawierać co najmniej 4 różne znaki."
-            return self.power
-        if self.password.isdigit():
-            self.power = "Hasło składające się wyłącznie z cyfr jest bardzo słabe."
-            return self.power
-        else:
-            self.power = "Hasło jest wystarczająco silne!"
-            return self.power
+        dlugosc_hasla = len(self.password)
+        znaki = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+{}[]|;:,.<>?/~`"
+        liczba_znakow = len(znaki)
+        liczba_kombinacji_slownikowy = liczba_znakow ** dlugosc_hasla
+        liczba_kombinacji_brute_force = math.factorial(dlugosc_hasla) * (liczba_znakow ** dlugosc_hasla)
+        moc_komputera = psutil.cpu_count() * psutil.cpu_freq().max
+        szybkosc_ataku = moc_komputera * 1000000
+        czas_zlamania_slownik = liczba_kombinacji_slownikowy / szybkosc_ataku
+        czas_zlamania_brute = liczba_kombinacji_brute_force / szybkosc_ataku
+
+        jednostki_czasu = [("lat", 60 * 60 * 24 * 365), ("dni", 60 * 60 * 24), ("godzin", 60 * 60), ("minut", 60), ("sekundy", 1)]
+
+        for jednostka, wartosc_w_sekundach in jednostki_czasu:
+            if czas_zlamania_brute >= wartosc_w_sekundach:
+                czas_brute_jednostka = czas_zlamania_brute / wartosc_w_sekundach
+                czas_zlamania_brute %= wartosc_w_sekundach
+                czas_zlamania_brute = int(czas_zlamania_brute)
+                break
+
+        for jednostka, wartosc_w_sekundach in jednostki_czasu:
+            if czas_zlamania_slownik >= wartosc_w_sekundach:
+                czas_slownik_jednostka = czas_zlamania_slownik / wartosc_w_sekundach
+                czas_zlamania_slownik %= wartosc_w_sekundach
+                czas_zlamania_slownik = int(czas_zlamania_slownik)
+                break
+
+        self.power = (f"""Hasło można złamać:
+            metodą brute force w czasie {math.floor(czas_brute_jednostka)} {jednostka}
+            metodą słownikową w czasie {math.floor(czas_slownik_jednostka)} {jednostka}""")
+        return self.power
 
     def check_passwd_power(self):
         self.check_password_strength()
         self.msgbox = (f"""
             Wygenerowane hasło to:\n
             {str(self.password)}\n
-            {self.power}
+            {self.power}\n
             Hasło zostało skopiowane do schowka!
                 """)
         messagebox.showinfo('Śliwka Coding Center ©', self.msgbox)
@@ -2983,7 +3404,7 @@ class Transliteracja(tk.Toplevel):
 
         self.output_text_ru = tk.Text(self.tab1_rus, height=4, width=50)
         self.output_text_ru.grid(row=4, column=0, padx=5, pady=5, columnspan=3)
-        
+
         # Zakładka numer 2 JĘZYK UKRAIŃSKI
 
         self.tab2_ukr = ttk.Frame(self.tabGeneral)
@@ -2991,7 +3412,8 @@ class Transliteracja(tk.Toplevel):
 
         self.input_label_ukr = tk.Label(
             self.tab2_ukr, text="Wprowadź tekst do transliteracji\n z języka ukraińskiego na alfabet łaciński")
-        self.input_label_ukr.grid(row=0, column=0, padx=5, pady=5, columnspan=3)
+        self.input_label_ukr.grid(
+            row=0, column=0, padx=5, pady=5, columnspan=3)
 
         self.input_text_ukr = tk.Text(self.tab2_ukr, height=4, width=50)
         self.input_text_ukr.grid(row=1, column=0, padx=5, pady=5, columnspan=3)
@@ -3009,8 +3431,9 @@ class Transliteracja(tk.Toplevel):
         self.back_button.grid(row=2, column=2, padx=5, pady=5)
 
         self.output_text_ukr = tk.Text(self.tab2_ukr, height=4, width=50)
-        self.output_text_ukr.grid(row=4, column=0, padx=5, pady=5, columnspan=3)
-        
+        self.output_text_ukr.grid(
+            row=4, column=0, padx=5, pady=5, columnspan=3)
+
         # Zakładka numer 3 JĘZYK BIAŁORUSKI
 
         self.tab3_bel = ttk.Frame(self.tabGeneral)
@@ -3018,7 +3441,8 @@ class Transliteracja(tk.Toplevel):
 
         self.input_label_bel = tk.Label(
             self.tab3_bel, text="Wprowadź tekst do transliteracji\n z języka białoruskiego na alfabet łaciński")
-        self.input_label_bel.grid(row=0, column=0, padx=5, pady=5, columnspan=3)
+        self.input_label_bel.grid(
+            row=0, column=0, padx=5, pady=5, columnspan=3)
 
         self.input_text_bel = tk.Text(self.tab3_bel, height=4, width=50)
         self.input_text_bel.grid(row=1, column=0, padx=5, pady=5, columnspan=3)
@@ -3036,7 +3460,8 @@ class Transliteracja(tk.Toplevel):
         self.back_button.grid(row=2, column=2, padx=5, pady=5)
 
         self.output_text_bel = tk.Text(self.tab3_bel, height=4, width=50)
-        self.output_text_bel.grid(row=4, column=0, padx=5, pady=5, columnspan=3)
+        self.output_text_bel.grid(
+            row=4, column=0, padx=5, pady=5, columnspan=3)
 
     def transliteracja_ru(self):
         text_to_translate = self.input_text_ru.get("1.0", "end-1c")
@@ -3052,7 +3477,7 @@ class Transliteracja(tk.Toplevel):
     def transliteracja_ukr(self):
         text_to_translate = self.input_text_ukr.get("1.0", "end-1c")
         self.translated_text = []
-        
+
         for i, char in enumerate(text_to_translate):
             if char.lower() == "г" and i > 0 and text_to_translate[i-1].lower() == "з":
                 translated_char = "gh"
@@ -3079,15 +3504,15 @@ class Transliteracja(tk.Toplevel):
             else:
                 translated_char = self.all_chars_ukr.get(char, char)
             self.translated_text.append(translated_char)
-        
+
         self.output_text_ukr.delete("1.0", "end")
         self.output_text_ukr.insert("end", ''.join(self.translated_text))
-        
+
     def transliteracja_bel(self):
         text_to_translate = self.input_text_bel.get("1.0", "end-1c")
         self.translated_text = []
         vowels = "АЕЁІЎЫЭЮЯаеёіўыэюя"
-        
+
         for i, char in enumerate(text_to_translate):
             if char.lower() == "е" and (i == 0 or text_to_translate[i-1] in vowels or text_to_translate[i-1] == "'" or
                                         (i > 1 and text_to_translate[i-2:i] in {"ў", "ь"})):
@@ -3104,7 +3529,7 @@ class Transliteracja(tk.Toplevel):
             else:
                 translated_char = self.all_chars_bel.get(char, char)
             self.translated_text.append(translated_char)
-        
+
         self.output_text_bel.delete("1.0", "end")
         self.output_text_bel.insert("end", ''.join(self.translated_text))
 
@@ -3112,17 +3537,16 @@ class Transliteracja(tk.Toplevel):
         self.keyboard_frame_ru = tk.Toplevel(self)
         self.keyboard_frame_ru.title("KLAWIATURA ROSYJSKA")
         self.create_keyboard_ru(self.keyboard_frame_ru)
-    
+
     def show_keyboard_ukr(self):
         self.keyboard_frame_ukr = tk.Toplevel(self)
         self.keyboard_frame_ukr.title("KLAWIATURA UKRAIŃSKA")
         self.create_keyboard_ukr(self.keyboard_frame_ukr)
-    
+
     def show_keyboard_bel(self):
         self.keyboard_frame_bel = tk.Toplevel(self)
         self.keyboard_frame_bel.title("KLAWIATURA BIAŁORUSKA")
         self.create_keyboard_bel(self.keyboard_frame_bel)
-
 
     def create_keyboard_ru(self, parent):
         self.rows_small = [
@@ -3140,8 +3564,10 @@ class Transliteracja(tk.Toplevel):
 
         self.update_keyboard_ru(parent)
 
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_ru)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_ru)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def toggle_case_ru(self):
         self.rows = self.rows_big if self.rows == self.rows_small else self.rows_small
@@ -3153,11 +3579,14 @@ class Transliteracja(tk.Toplevel):
 
         for i, row in enumerate(self.rows):
             for j, char in enumerate(row):
-                button = tk.Button(parent, text=char, command=lambda c=char: self.insert_char_ru(c))
+                button = tk.Button(
+                    parent, text=char, command=lambda c=char: self.insert_char_ru(c))
                 button.grid(row=i, column=j, padx=5, pady=5)
-        
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_ru)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_ru)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def create_keyboard_ukr(self, parent):
         self.rows_small = [
@@ -3176,8 +3605,10 @@ class Transliteracja(tk.Toplevel):
 
         self.update_keyboard_ukr(parent)
 
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_ukr)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_ukr)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def toggle_case_ukr(self):
         self.rows = self.rows_big if self.rows == self.rows_small else self.rows_small
@@ -3189,11 +3620,14 @@ class Transliteracja(tk.Toplevel):
 
         for i, row in enumerate(self.rows):
             for j, char in enumerate(row):
-                button = tk.Button(parent, text=char, command=lambda c=char: self.insert_char_ukr(c))
+                button = tk.Button(
+                    parent, text=char, command=lambda c=char: self.insert_char_ukr(c))
                 button.grid(row=i, column=j, padx=5, pady=5)
-        
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_ukr)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_ukr)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def create_keyboard_bel(self, parent):
         self.rows_small = [
@@ -3212,8 +3646,10 @@ class Transliteracja(tk.Toplevel):
 
         self.update_keyboard_bel(parent)
 
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_bel)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_bel)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def toggle_case_bel(self):
         self.rows = self.rows_big if self.rows == self.rows_small else self.rows_small
@@ -3225,11 +3661,14 @@ class Transliteracja(tk.Toplevel):
 
         for i, row in enumerate(self.rows):
             for j, char in enumerate(row):
-                button = tk.Button(parent, text=char, command=lambda c=char: self.insert_char_bel(c))
+                button = tk.Button(
+                    parent, text=char, command=lambda c=char: self.insert_char_bel(c))
                 button.grid(row=i, column=j, padx=5, pady=5)
-        
-        self.toggle_case_button = tk.Button(parent, text="CAPS LOCK", command=self.toggle_case_bel)
-        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(self.rows_big[0]), padx=5, pady=5)
+
+        self.toggle_case_button = tk.Button(
+            parent, text="CAPS LOCK", command=self.toggle_case_bel)
+        self.toggle_case_button.grid(row=len(self.rows_big), column=0, columnspan=len(
+            self.rows_big[0]), padx=5, pady=5)
 
     def insert_char_ru(self, char):
         current_text = self.input_text_ru.get("1.0", "end-1c")
@@ -3240,7 +3679,7 @@ class Transliteracja(tk.Toplevel):
         current_text = self.input_text_ukr.get("1.0", "end-1c")
         self.input_text_ukr.delete("1.0", "end")
         self.input_text_ukr.insert("end", current_text + char)
-        
+
     def insert_char_bel(self, char):
         current_text = self.input_text_bel.get("1.0", "end-1c")
         self.input_text_bel.delete("1.0", "end")
