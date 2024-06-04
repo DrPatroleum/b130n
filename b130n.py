@@ -301,6 +301,7 @@ class MenuApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("B130N by Śliwka")
+        self.resizable(False, False)
 
         self.button1 = tk.Button(
             self, text="DIETY\n KRAJOWE", command=self.open_diety_krajowe, width=15, height=5)
@@ -1403,18 +1404,24 @@ class DietyKrajowe(tk.Toplevel):
 
         try:
             sniadanie = int(self.ilosc_sniadaniedk.get()) * 11.25
+            liczba_sniadań = int(self.ilosc_sniadaniedk.get())
         except ValueError:
             sniadanie = 0
+            liczba_sniadań = 0
 
         try:
             obiad = int(self.ilosc_obiaddk.get()) * 22.50
+            liczba_obiadow = int(self.ilosc_obiaddk.get())
         except ValueError:
             obiad = 0
+            liczba_obiadow = 0
 
         try:
             kolacja = int(self.ilosc_kolacjadk.get()) * 11.25
+            liczba_kolacji = int(self.ilosc_kolacjadk.get())
         except ValueError:
             kolacja = 0
+            liczba_kolacji = 0
 
         if self.nocleg_var1.get():
             self.ryczalt_nocleg
@@ -1422,7 +1429,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za nocleg należy doliczyć {round(self.ryczalt_nocleg,2)} PLN.")
         else:
             self.ryczalt_nocleg = 0
-            ryc_noc_info = ("")
+            ryc_noc_info = ("Ryczałt za nocleg nie przysługuje.")
 
         if self.auto_var2.get():
             self.ryczalt_auto
@@ -1430,7 +1437,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy doliczyć {round(self.ryczalt_auto,2)} PLN.")
         else:
             self.ryczalt_auto = 0
-            ryc_auto_info = ("")
+            ryc_auto_info = ("Ryczałt za pozdróż prywatnym środkiem transportu nie przysługuje.")
 
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
@@ -1438,7 +1445,7 @@ class DietyKrajowe(tk.Toplevel):
                 f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy doliczyć {round(self.ryczalt_komunikacja,2)} PLN.")
         else:
             self.ryczalt_komunikacja = 0
-            ryc_kom_info = ("")
+            ryc_kom_info = ("Ryczałt za dojazd środkami komunikacji miejscowej nie przysługuje.")
 
         zarcie = sniadanie + obiad + kolacja
         dieta = nalezna_dieta_dzien + nalezna_dieta_godz
@@ -1447,12 +1454,12 @@ class DietyKrajowe(tk.Toplevel):
         if zarcie != 0:
             zarcie_info = (
                 f"""Za zapewnione posiłki należy odjąć {round(zarcie,2)} PLN.
-                - {self.ilosc_sniadaniedk.get()}x śniadanie = {sniadanie} PLN
-                - {self.ilosc_obiaddk.get()}x obiad = {obiad} PLN
-                - {self.ilosc_kolacjadk.get()}x kolacja = {kolacja} PLN
-                Po odjęciu posiłków dieta wynosi {dieta_bez_posilkow} PLN.""")
+                - {liczba_sniadań} razy śniadanie = {round(sniadanie,2)} PLN
+                - {liczba_obiadow} razy obiad = {round(obiad,2)} PLN
+                - {liczba_kolacji} razy kolacja = {round(kolacja,2)} PLN
+                Po odjęciu posiłków dieta wynosi {round(dieta_bez_posilkow,2)} PLN.""")
         else:
-            zarcie_info = ("")
+            zarcie_info = ("Nie zapewniono posiłków podczas delegacji.")
 
         nalezna_dieta = nalezna_dieta_dzien + \
             nalezna_dieta_godz - sniadanie - obiad - kolacja + \
@@ -1477,7 +1484,7 @@ class DietyKrajowe(tk.Toplevel):
         else:
             wersja_minut = "minut"
 
-        dodatki = zarcie + self.komunikacja_var3.get() + self.auto_var2.get() + \
+        dodatki = self.komunikacja_var3.get() + self.auto_var2.get() + \
             self.nocleg_var1.get()
 
         if dodatki != 0:
@@ -1485,20 +1492,21 @@ class DietyKrajowe(tk.Toplevel):
                 Start delegacji: {data_startu}
                 Koniec delegacji: {data_konca}\n
                 Delegacja trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}.
-                Przysługuje Ci za to {round(dieta,2)} PLN.
+                Przysługuje za to {round(dieta,2)} PLN.
                 ({round(nalezna_dieta_dzien,2)} PLN za pełne dni + {round(nalezna_dieta_godz,2)} PLN reszta)\n
-                {zarcie_info}
+                {zarcie_info}\n
                 {ryc_noc_info}
                 {ryc_kom_info}
-                {ryc_auto_info}
-                Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
+                {ryc_auto_info}\n
+                Finalnie należy się {round(nalezna_dieta,2)} PLN.
                 """)
         else:
             result = (f"""
                 Start delegacji: {data_startu}
                 Koniec delegacji: {data_konca}\n
                 Delegacja trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut} ({round(nalezna_dieta_dzien,2)} PLN + {round(nalezna_dieta_godz,2)} PLN).\n
-                Finalnie należy ci się {round(nalezna_dieta,2)} PLN.
+                {zarcie_info}\n
+                Finalnie należy się {round(nalezna_dieta,2)} PLN.
                 """)
 
         self.label_wynik.config(text=result)
@@ -1759,7 +1767,7 @@ class DietyZagraniczne(tk.Toplevel):
         self.label_dodatki = Label(
             self.page4, text="Wskaż przysługujące ci ryczałty")
         self.label_dodatki.grid(
-            row=4, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
+            row=0, column=0, sticky=EW, padx=5, pady=5, columnspan=8)
 
         self.nocleg_var1 = tk.BooleanVar()
         self.auto_var2 = tk.BooleanVar()
@@ -1768,7 +1776,7 @@ class DietyZagraniczne(tk.Toplevel):
         self.dojazd_z_var5 = tk.BooleanVar()
 
         self.checkframe = Frame(self.page4)
-        self.checkframe.grid(row=5, column=0, columnspan=8)
+        self.checkframe.grid(row=1, column=0, columnspan=8)
 
         self.check_nocleg = Checkbutton(
             self.checkframe, text="NOCLEG", variable=self.nocleg_var1, command=self.rycz_nocleg)
@@ -1787,7 +1795,7 @@ class DietyZagraniczne(tk.Toplevel):
         self.check_dojazd_z.grid(row=4, column=0, padx=5, pady=5, sticky=W)
         
         self.button_container = tk.Frame(self.page4)
-        self.button_container.grid(row=5, column=0, padx=5, pady=5, columnspan=8)
+        self.button_container.grid(row=2, column=0, padx=5, pady=5, columnspan=8)
         
         self.button_back_page2 = tk.Button(
             self.button_container, text="WSTECZ", command=self.back_page4)
@@ -2086,18 +2094,24 @@ class DietyZagraniczne(tk.Toplevel):
 
         try:
             sniadanie = int(self.zilosc_sniadanie.get()) * (dieta * 0.15)
+            liczba_sniadan = int(self.zilosc_sniadanie.get())
         except ValueError:
             sniadanie = 0
+            liczba_sniadan = 0
 
         try:
             obiad = int(self.zilosc_obiad.get()) * (dieta * 0.3)
+            liczba_obiadow = int(self.zilosc_obiad.get())
         except ValueError:
             obiad = 0
+            liczba_obiadow = 0
 
         try:
             kolacja = int(self.zilosc_kolacja.get()) * (dieta * 0.3)
+            liczba_kolacji = int(self.zilosc_kolacja.get())
         except ValueError:
             kolacja = 0
+            liczba_kolacji = 0
 
         if self.nocleg_var1.get():
             self.ryczalt_nocleg
@@ -2105,7 +2119,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za nocleg należy doliczyć {round(self.ryczalt_nocleg,2)} {omega}.")
         else:
             self.ryczalt_nocleg = 0
-            ryc_noc_info = ("")
+            ryc_noc_info = ("Ryczałt za nocleg nie przysługuje.")
 
         if self.auto_var2.get():
             self.ryczalt_auto
@@ -2113,7 +2127,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za pozdróż prywatnym środkiem transportu\n należy doliczyć {round(self.ryczalt_auto,2)} {omega}.")
         else:
             self.ryczalt_auto = 0
-            ryc_auto_info = ("")
+            ryc_auto_info = ("Ryczałt za pozdróż prywatnym środkiem transportu nie przysługuje.")
 
         if self.komunikacja_var3.get():
             self.ryczalt_komunikacja
@@ -2121,7 +2135,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd środkami komunikacji miejscowej\n należy doliczyć {round(self.ryczalt_komunikacja,2)} {omega}.")
         else:
             self.ryczalt_komunikacja = 0
-            ryc_kom_info = ("")
+            ryc_kom_info = ("Ryczałt za dojazd środkami komunikacji miejscowej nie przysługuje.")
 
         if self.dojazd_do_var4.get():
             self.ryczalt_dojazd_do
@@ -2129,7 +2143,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd do lotniska należy doliczyć {round(self.ryczalt_dojazd_do,2)} {omega}.")
         else:
             self.ryczalt_dojazd_do = 0
-            ryc_dojazd_do = ("")
+            ryc_dojazd_do = ("Ryczałt za dojazd do lotniska nie przysługuje.")
 
         if self.dojazd_z_var5.get():
             self.ryczalt_dojazd_z
@@ -2137,7 +2151,7 @@ class DietyZagraniczne(tk.Toplevel):
                 f"Za ryczałt za dojazd z lotniska należy doliczyć {round(self.ryczalt_dojazd_z,2)} {omega}.")
         else:
             self.ryczalt_dojazd_z = 0
-            ryc_dojazd_z = ("")
+            ryc_dojazd_z = ("Ryczałt za dojazd z lotniska nie przysługuje.")
 
         zarcie = sniadanie + obiad + kolacja
         diet = nalezna_dieta_dzien + nalezna_dieta_godz
@@ -2146,12 +2160,12 @@ class DietyZagraniczne(tk.Toplevel):
         if zarcie != 0:
             zarcie_info = (
                 f"""Za zapewnione posiłki należy odjąć {round(zarcie,2)} {omega}.
-                - {self.zilosc_sniadanie.get()}x śniadanie = {sniadanie} {omega}
-                - {self.zilosc_obiad.get()}x obiad = {obiad} {omega}
-                - {self.zilosc_kolacja.get()}x kolacja = {kolacja} {omega}
-                Po odjęciu posiłków dieta wynosi {dieta_bez_posilkow} {omega}.""")
+                - {liczba_sniadan} razy śniadanie = {round(sniadanie,2)} {omega}
+                - {liczba_obiadow} razy obiad = {round(obiad,2)} {omega}
+                - {liczba_kolacji} razy kolacja = {round(kolacja,2)} {omega}
+                Po odjęciu posiłków dieta wynosi {round(dieta_bez_posilkow,2)} {omega}.""")
         else:
-            zarcie_info = ("")
+            zarcie_info = ("Nie zapewniono posiłków podczas delegacji.")
 
         nalezna_dieta = nalezna_dieta_dzien + \
             nalezna_dieta_godz - sniadanie - obiad - kolacja + \
@@ -2177,7 +2191,7 @@ class DietyZagraniczne(tk.Toplevel):
         else:
             wersja_minut = "minut"
 
-        dodatki = zarcie + self.dojazd_z_var5.get() + self.dojazd_do_var4.get() + \
+        dodatki = self.dojazd_z_var5.get() + self.dojazd_do_var4.get() + \
             self.komunikacja_var3.get() + self.auto_var2.get() + self.nocleg_var1.get()
 
         naleznosc = (nalezna_dieta_dzien + nalezna_dieta_godz)*(float(self.wybor_naleznosc.get()))
@@ -2187,34 +2201,35 @@ class DietyZagraniczne(tk.Toplevel):
                 Start delegacji: {data_startu}
                 Koniec delegacji: {data_konca}\n
                 Delegacja {gamma} trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}
-                Przysługuje Ci za to {round(diet,2)} {omega}.
+                Przysługuje za to {round(diet,2)} {omega}.
                 ({round(nalezna_dieta_dzien,2)} {omega} za pełne dni + {round(nalezna_dieta_godz,2)} {omega} reszta)\n
-                {zarcie_info}
+                {zarcie_info}\n
                 {ryc_noc_info}
                 {ryc_kom_info}
                 {ryc_auto_info}
                 {ryc_dojazd_do}
-                {ryc_dojazd_z}
-                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.\n
+                {ryc_dojazd_z}\n
+                Finalnie należy się {round(nalezna_dieta,2)} {omega}.\n
                 ***N A L E Ż N O Ś Ć***\n
                 Przysługuje Ci {round(naleznosc,2)} {omega} należności.
-                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {nalezna_dieta_dzien} {omega}]
-                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {nalezna_dieta_godz} {omega}]
-                - razem [{diet} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
+                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
+                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {round(nalezna_dieta_godz,2)} {omega}]
+                - razem [{round(diet,2)} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
         else:
             result = (f"""
                 Start delegacji: {data_startu}
                 Koniec delegacji: {data_konca}\n
                 Delegacja {gamma} trwała {int(liczba_dni)} {wersja_dzien}, {int(liczba_godzin)} {wersja_godzin} i {int(liczba_minut)} {wersja_minut}
-                Przysługuje Ci za to {round(diet,2)} {omega}.
+                Przysługuje za to {round(diet,2)} {omega}.
                 ({round(nalezna_dieta_dzien,2)} {omega} za pełne dni + {round(nalezna_dieta_godz,2)} {omega} reszta)\n
-                Finalnie należy ci się {round(nalezna_dieta,2)} {omega}.\n
+                {zarcie_info}\n
+                Finalnie należy się {round(nalezna_dieta,2)} {omega}.\n
                 ***N A L E Ż N O Ś Ć***\n
                 Przysługuje Ci {round(naleznosc,2)} {omega} należności.
-                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {nalezna_dieta_dzien} {omega}]
-                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {nalezna_dieta_godz} {omega}]
-                - razem [{diet} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
+                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
+                - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {round(nalezna_dieta_godz,2)} {omega}]
+                - razem [{round(diet,2)} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
 
         self.zlabel_wynik.config(text=result)
@@ -2276,7 +2291,7 @@ class DietyZagraniczne(tk.Toplevel):
 
     def next_page3(self):
         if (self.zilosc_sniadanie.get().isdigit() or self.zilosc_sniadanie.get() == "") and (self.zilosc_obiad.get().isdigit() or self.zilosc_obiad.get() == "") and (self.zilosc_kolacja.get().isdigit() or self.zilosc_kolacja.get() == ""):
-            self.next_page4()
+            self.show_page(self.page4)
         else:
             messagebox.showerror(
                 "Błąd", "Wprowadzono nieprawidłowe wartości. Proszę wprowadzić liczby.")
@@ -2310,19 +2325,16 @@ class DietyZagraniczne(tk.Toplevel):
 
 class PESEL(tk.Toplevel):
     data = ''
-    women_names = ["ANNA", "KATARZYNA", "MARIA", "MAŁGORZATA", "AGNIESZKA", "BARBARA", "EWA", "MAGDALENA", "ELŻBIETA", "KRYSTYNA", "JOANNA",
-                   "ALEKSANDRA", "MONIKA", "ZOFIA", "TERESA", "NATALIA", "JULIA", "DANUTA", "KAROLINA", "MARTA", "BEATA", "DOROTA", "ALICJA", "HALINA",
-                   "JADWIGA", "JOLANTA", "IWONA", "GRAŻYNA", "JANINA", "PAULINA", "ZUZANNA", "JUSTYNA", "IRENA", "HANNA", "WIKTORIA",
-                   "BOŻENA", "RENATA", "URSZULA", "AGATA", "SYLWIA", "MAJA", "PATRYCJA", "HELENA", "IZABELA", "EMILIA", "OLIWIA", "ANETA", "WERONIKA",
+    women_names = ["ANNA", "KATARZYNA", "MARIA", "MAŁGORZATA", "AGNIESZKA", "BARBARA", "EWA", "MAGDALENA", "JOANNA",
+                   "ALEKSANDRA", "MONIKA", "ZOFIA", "NATALIA", "JULIA", "KAROLINA", "MARTA", "BEATA", "DOROTA", "ALICJA", 
+                   "JOLANTA", "IWONA", "PAULINA", "ZUZANNA", "JUSTYNA", "HANNA", "WIKTORIA",
+                   "RENATA", "URSZULA", "AGATA", "SYLWIA", "PATRYCJA", "IZABELA", "EMILIA", "OLIWIA", "ANETA", "WERONIKA",
                    "EWELINA", "MARTYNA", "KLAUDIA", "GABRIELA", "MARZENA", "LENA", "DOMINIKA", "MARIANNA", "AMELIA", "KINGA",
-                   "STANISŁAWA", "EDYTA", "KAMILA", "WIESŁAWA", "ALINA", "WANDA", "DARIA", "LIDIA", "MARIOLA", "LUCYNA", "NIKOLA", "MILENA", "WIOLETTA",
-                   "MIROSŁAWA", "LAURA", "ANTONINA", "ANGELIKA", "OLGA", "KAZIMIERA", "BOGUMIŁA", "ILONA", "MICHALINA", "SANDRA", "GENOWEFA", "KORNELIA",
-                   "MARLENA", "HENRYKA", "ŁUCJA", "SABINA", "BOGUSŁAWA", "NINA", "JÓZEFA", "ANITA", "STEFANIA", "IGA", "LILIANA", "REGINA", "POLA",
-                   "MARCELINA", "JAGODA", "CZESŁAWA", "ANIELA", "WŁADYSŁAWA", "KARINA", "WIOLETA", "ADRIANNA", "DIANA", "ROKSANA",
-                   "DAGMARA", "SARA", "MALWINA", "ELIZA", "CECYLIA", "ŻANETA", "ZDZISŁAWA", "KLARA", "RÓŻA", "KAJA", "LEOKADIA", "BLANKA", "ANASTAZJA", "BRONISŁAWA",
-                   "EUGENIA", "JULITA", "ALDONA", "ROZALIA", "DANIELA", "LILIANNA", "MAGDA", "CELINA", "MATYLDA", "ADRIANA", "HONORATA", "VERONIKA",
-                   "NELA", "PAULA", "BRYGIDA", "AURELIA", "KALINA", "MARIKA", "GERTRUDA", "MIECZYSŁAWA", "SONIA", "ELWIRA", "ANDŻELIKA", "POLINA",
-                   "ARLETA", "LUIZA", "ADELA", "JUDYTA", "NICOLE", "FRANCISZKA", "MARIANA", "NICOLA", "LIWIA", "JOWITA", "VANESSA", "ALFREDA"]
+                   "EDYTA", "KAMILA", "ALINA", "WANDA", "DARIA", "MARIOLA", "MILENA", "WIOLETTA",
+                   "LAURA", "OLGA", "KAZIMIERA", "ILONA", "MICHALINA", "SANDRA", "GENOWEFA",
+                   "MARLENA", "SABINA", "NINA", "ANITA", "IGA", "POLA", "MARCELINA", "ANIELA", "KARINA", "ADRIANNA", "DIANA", "ROKSANA",
+                   "DAGMARA", "MALWINA", "ELIZA", "KLARA", "RÓŻA", "KAJA", "LEOKADIA", "BLANKA", "ANASTAZJA", "BRONISŁAWA",
+                   "JULITA", "DANIELA", "MAGDA", "MATYLDA", "ADRIANA", "LUIZA", "JUDYTA"]
     women_surnames = ["NOWAK", "KOWALSKA", "WIŚNIEWSKA", "WÓJCIK", "KOWALCZYK", "KAMIŃSKA", "LEWANDOWSKA", "ZIELIŃSKA", "SZYMAŃSKA", "DĄBROWSKA",
                       "WOŹNIAK", "KOZŁOWSKA", "MAZUR", "JANKOWSKA", "KWIATKOWSKA", "WOJCIECHOWSKA", "KRAWCZYK", "KACZMAREK", "PIOTROWSKA", "GRABOWSKA", "PAWŁOWSKA",
                       "MICHALSKA", "KRÓL", "ZAJĄC", "WIECZOREK", "JABŁOŃSKA", "WRÓBEL", "NOWAKOWSKA", "MAJEWSKA", "OLSZEWSKA", "ADAMCZYK", "JAWORSKA", "MALINOWSKA",
@@ -2340,17 +2352,13 @@ class PESEL(tk.Toplevel):
                       "KOWAL", "ŚLIWIŃSKA", "SKIBA", "MAŁECKA", "BEDNARCZYK", "SOCHA", "DOBROWOLSKA", "MICHALIK", "ROMANOWSKA", "DOMAGAŁA", "RATAJCZAK", "WRONA",
                       "WILCZYŃSKA", "KASPRZAK", "MATUSZEWSKA", "ORZECHOWSKA", "ŚWIĄTEK", "OLEJNICZAK", "PAJĄK", "RYBAK", "KUROWSKA", "BUKOWSKA", "SOBOLEWSKA",
                       "OWCZAREK", "MAZURKIEWICZ", "ŁUKASIK", "ROGOWSKA", "OLEJNIK", "GRZELAK", "KĘDZIERSKA", "KOSIŃSKA", "BARAŃSKA", "MATUSIAK", "SOBCZYK"]
-    men_names = ["PIOTR", "KRZYSZTOF", "ANDRZEJ", "TOMASZ", "PAWEŁ", "MICHAŁ", "JAN", "MARCIN", "JAKUB", "ADAM", "ŁUKASZ", "MAREK", "GRZEGORZ",
-                 "MATEUSZ", "STANISŁAW", "WOJCIECH", "MARIUSZ", "DARIUSZ", "MACIEJ", "ZBIGNIEW", "RAFAŁ", "ROBERT", "KAMIL", "JERZY", "DAWID",
-                 "SZYMON", "JACEK", "KACPER", "JÓZEF", "RYSZARD", "TADEUSZ", "BARTOSZ", "ARTUR", "JAROSŁAW", "SŁAWOMIR", "SEBASTIAN", "JANUSZ",
-                 "DAMIAN", "MIROSŁAW", "PATRYK", "ROMAN", "DANIEL", "FILIP", "HENRYK", "ANTONI", "PRZEMYSŁAW", "KAROL", "ALEKSANDER", "ADRIAN",
-                 "KAZIMIERZ", "WIESŁAW", "MARIAN", "ARKADIUSZ", "DOMINIK", "FRANCISZEK", "MIKOŁAJ", "BARTŁOMIEJ", "LESZEK", "WIKTOR", "KRYSTIAN",
-                 "WALDEMAR", "RADOSŁAW", "BOGDAN", "ZDZISŁAW", "KONRAD", "IGOR", "HUBERT", "EDWARD", "MIECZYSŁAW", "OSKAR", "MARCEL", "WŁADYSŁAW",
-                 "CZESŁAW", "MAKSYMILIAN", "EUGENIUSZ", "MIŁOSZ", "BOGUSŁAW", "IRENEUSZ", "NIKODEM", "STEFAN", "WITOLD", "LEON", "OLIWIER", "SYLWESTER",
-                 "ZYGMUNT", "ALAN", "WŁODZIMIERZ", "CEZARY", "ZENON", "GABRIEL", "IGNACY", "JULIAN", "NORBERT", "TYMON", "TYMOTEUSZ", "FABIAN", "BŁAŻEJ",
-                 "ERYK", "EMIL", "LECH", "BRONISŁAW", "WACŁAW", "NATAN", "KSAWERY", "BORYS", "BOLESŁAW", "REMIGIUSZ", "OLAF", "BERNARD", "KAJETAN", "KUBA",
-                 "EDMUND", "LUCJAN", "BRUNO", "ALBERT", "TOBIASZ", "ROMUALD", "GRACJAN", "SEWERYN", "SZCZEPAN", "ALFRED", "ERNEST", "JOACHIM", "LUDWIK",
-                 "LESŁAW", "BOGUMIŁ", "JĘDRZEJ", "GERARD", "FELIKS", "LEONARD", "JULIUSZ", "KLAUDIUSZ", "DORIAN", "TEODOR"]
+    men_names = ["PIOTR", "KRZYSZTOF", "TOMASZ", "PAWEŁ", "MICHAŁ", "JAN", "MARCIN", "JAKUB", "ADAM", "ŁUKASZ", "MAREK", "GRZEGORZ",
+                 "MATEUSZ", "WOJCIECH", "MARIUSZ", "DARIUSZ", "MACIEJ", "RAFAŁ", "ROBERT", "KAMIL", "DAWID",
+                 "SZYMON", "JACEK", "KACPER", "JÓZEF", "RYSZARD", "BARTOSZ", "ARTUR", "JAROSŁAW", "SEBASTIAN",
+                 "DAMIAN", "PATRYK", "ROMAN", "DANIEL", "FILIP", "PRZEMYSŁAW", "KAROL", "ALEKSANDER", "ADRIAN",
+                 "ARKADIUSZ", "DOMINIK", "MIKOŁAJ", "BARTŁOMIEJ", "WIKTOR", "KRYSTIAN",
+                 "RADOSŁAW", "KONRAD", "IGOR", "HUBERT", "EDWARD", "OSKAR", "MARCEL", "MAKSYMILIAN", "MIŁOSZ", "BOGUSŁAW", "IRENEUSZ", "NIKODEM", "STEFAN", "LEON", "OLIWIER", "SYLWESTER",
+                 "CEZARY", "ZENON", "GABRIEL", "IGNACY", "JULIAN", "NORBERT", "TYMON", "BŁAŻEJ", "ERYK", "EMIL", "KSAWERY", "BORYS", "OLAF", "KAJETAN", "KUBA","ALBERT"]
     men_surnames = ["NOWAK", "KOWALSKI", "WIŚNIEWSKI", "WÓJCIK", "KOWALCZYK", "KAMIŃSKI", "LEWANDOWSKI", "ZIELIŃSKI", "WOŹNIAK", "ZYMAŃSKI", "DĄBROWSKI",
                     "KOZŁOWSKI", "MAZUR", "JANKOWSKI", "KWIATKOWSKI", "WOJCIECHOWSKI", "KRAWCZYK", "KACZMAREK", "PIOTROWSKI", "GRABOWSKI", "ZAJĄC",
                     "PAWŁOWSKI", "KRÓL", "MICHALSKI", "WRÓBEL", "WIECZOREK", "JABŁOŃSKI", "NOWAKOWSKI", "MAJEWSKI", "OLSZEWSKI", "DUDEK", "JAWORSKI",
@@ -2369,10 +2377,12 @@ class PESEL(tk.Toplevel):
                     "BEDNARCZYK", "KASPRZAK", "DOBROWOLSKI", "WRONA", "PAJĄK", "MICHALIK", "MATUSZEWSKI", "RATAJCZAK", "OLEJNICZAK", "ORZECHOWSKI", "ŚWIĄTEK",
                     "WILCZYŃSKI", "ROMANOWSKI", "KUROWSKI", "OLEJNIK", "ŁUKASIK", "ROGOWSKI", "RYBAK", "GRZELAK", "MAZURKIEWICZ", "BUKOWSKI", "OWCZAREK", "SROKA",
                     "SOBOLEWSKI", "KOSIŃSKI", "KĘDZIERSKI", "BARAŃSKI", "ZYCH"]
-    cities = ["Warszawa", "Kraków", "Szczecin", "Łódź", "Wrocław", "Zielona Góra", "Gdańsk", "Gdynia", "Poznań",
-              "Katowice", "Białystok", "Kielce", "Bydgoszcz", "Toruń", "Częstochowa", "Lublin", "Rzeszów",
-              "Radom", "Gorzów Wielkopolski", "Koszalin", "Elbląg", "Olsztyn", "Łomża", "Siedlce", "Kalisz",
-              "Piotrków Trybunalski", "Nowy Sącz", "Opole", "Lubin", "Legnica", "Piła", "Płock"]
+    cities = ["WARSZAWA", "KRAKÓW", "SZCZECIN", "ŁÓDŹ", "WROCŁAW", "ZIELONA GÓRA", "GDAŃSK", "GDYNIA", "POZNAŃ",
+              "KATOWICE", "BIAŁYSTOK", "KIELCE", "BYDGOSZCZ", "TORUŃ", "CZĘSTOCHOWA", "LUBLIN", "RZESZÓW",
+              "RADOM", "GORZÓW WIELKOPOLSKI", "KOSZALIN", "ELBLĄG", "OLSZTYN", "ŁOMŻA", "SIEDLCE", "KALISZ",
+              "PIOTRKÓW TRYBUNALSKI", "NOWY SĄCZ", "OPOLE", "LUBIN", "LEGNICA", "PIŁA", "PŁOCK", "GOLENIÓW", "HRUBIESZÓW",
+              "LIPSKO", "MALBORK", "KARTUZY", "SKARŻYSKO-KAMIENNA", "ZAWIERCIE", "BOLESŁAWIEC", "MIĘDZYCHÓD", "OSTRZESZÓW",
+              "BRZEZINY", "RADZIEJÓW", "JAROSŁAW", "PRZEMYŚL", "PUŁAWY", "CHRZANÓW", "STARACHOWICE", "ŚWIĘTOCHŁOWICE"]
     months = ["01", "02", "03", "04", "05",
               "06", "07", "08", "09", "10", "11", "12"]
     days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13",
@@ -2980,68 +2990,43 @@ class KalkulatorWalut(tk.Toplevel):
     def strona_pierwsza(self):
         self.page1 = tk.Frame(self)
 
-        # OBCE NA PLN
+        self.label_start = tk.Label(self.page1, text="Wskaż kwotę do przeliczenia")
+        self.label_start.grid(row=0, column=0, padx=5, pady=5, sticky="ns", columnspan=2)
 
-        self.label_start = Label(
-            self.page1, text="Przeliczanie z waluty obcej na złotówki")
-        self.label_start.grid(row=1, column=0, padx=5,
-                              pady=5, sticky=W, columnspan=3)
+        self.kwota = tk.Entry(self.page1)
+        self.kwota.grid(row=1, column=0, padx=5, pady=5, sticky="ns", columnspan=2)
 
-        self.kwota = Entry(self.page1)
-        self.kwota.grid(row=2, column=0, sticky=NS, padx=5, pady=5)
+        self.options = ["polski złoty [PLN]", "dolar amerykański [USD]", "dolar australijski [AUD]", "dolar kanadyjski [CAD]", "euro [EUR]",
+           "forint [HUF]", "frank szwajcarski [CHF]", "funt szterling [GBP]", "hrywna [UAH]", "jen [JPY]",
+           "korona czeska [CZK]", "korona duńska [DKK]", "korona islandzka [ISK]", "korona norweska [NOK]",
+           "korona szwedzka [SEK]", "lej rumuński [RON]", "lira turecka [TRY]", "szekel [ILS]",
+           "dirham ZEA [AED]", "rubel białoruski [BYN]", "rubel rosyjski [RUB]", "bat tajski [THB]", "dolar nowozelandzki [NZD]",
+           "dolar singapurski [SGD]", "lew bułgarski [BGN]", "real brazylijski [BRL]", "rupia indonezyjska [IDR]",
+           "rupia indyjska [INR]","won koreański [KRW]","juan renminbi [CNY]","dong wietnamski [VND]","nowy dolar tajwański [TWD]"]
+        
+        self.option_var1 = tk.StringVar(self)
+        self.option_var2 = tk.StringVar(self)
+        
+        self.max_length = max(len(option) for option in self.options)
+        
+        self.option_menu1 = tk.OptionMenu(self.page1, self.option_var1, *self.options)
+        self.option_menu1.grid(row=2, column=0)
+        self.option_menu1.config(width=self.max_length + 2)
+        self.option_var1.set("Wybierz pierwszą walutę")
 
-        self.option_var = StringVar(self.page1)
-        self.max_length = max(len(option) for option in options)
+        self.option_menu2 = tk.OptionMenu(self.page1, self.option_var2, *self.options)
+        self.option_menu2.grid(row=2, column=1)
+        self.option_menu2.config(width=self.max_length + 2)
+        self.option_var2.set("Wybierz drugą walutę")
 
-        self.option_menu = OptionMenu(self.page1, self.option_var, *options)
-        self.option_menu.grid(row=2, column=1, sticky=NS)
-        self.option_menu.config(width=self.max_length + 2)
-        self.option_var.set("Wybierz walutę")
+        self.button_table = tk.Button(self.page1, text='KURS WALUT', command=self.tabela)
+        self.button_table.grid(row=3, column=0, padx=5, pady=5, sticky="e")
 
-        self.button = Button(self.page1, text='Przelicz',
-                             command=self.konwertuj_do_pln)
-        self.button.grid(row=2, column=2, sticky=NS, padx=5, pady=5)
+        self.button_convert = tk.Button(self.page1, text='PRZELICZ', command=self.konwertuj)
+        self.button_convert.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
-        self.label1 = Label(self.page1)
-        self.label1.grid(row=3, column=0, sticky=NS,
-                         columnspan=3, padx=5, pady=5)
-
-        # PLN NA OBCE
-
-        self.olabel_start = Label(
-            self.page1, text="Przeliczanie ze złotówek na walutę obcą")
-        self.olabel_start.grid(row=4, column=0, padx=5,
-                               pady=5, sticky=W, columnspan=3)
-
-        self.okwota = Entry(self.page1)
-        self.okwota.grid(row=5, column=0, sticky=NS, padx=5, pady=5)
-
-        self.ooption_var = StringVar(self.page1)
-        self.omax_length = max(len(option) for option in options)
-
-        self.ooption_menu = OptionMenu(self.page1, self.ooption_var, *options)
-        self.ooption_menu.grid(row=5, column=1, sticky=NS)
-        self.ooption_menu.config(width=self.omax_length + 2)
-        self.ooption_var.set("Wybierz walutę")
-
-        self.obutton = Button(self.page1, text='Przelicz',
-                              command=self.konwertuj_z_pln)
-        self.obutton.grid(row=5, column=2, sticky=NS, padx=5, pady=5)
-
-        self.olabel1 = Label(self.page1)
-        self.olabel1.grid(row=6, column=0, sticky=NS,
-                          columnspan=3, padx=5, pady=5)
-
-        self.buttonframe = Frame(self.page1)
-        self.buttonframe.grid(row=7, column=0, padx=10, pady=10, columnspan=3)
-
-        self.back_button = tk.Button(
-            self.buttonframe, text="POWRÓT DO MENU", command=self.back_to_menu)
-        self.back_button.grid(row=0, column=0, padx=10, pady=10)
-
-        self.tabela_button = tk.Button(
-            self.buttonframe, text="KURS WALUT", command=self.tabela)
-        self.tabela_button.grid(row=0, column=1, padx=10, pady=10)
+        self.label1 = tk.Label(self.page1)
+        self.label1.grid(row=4, column=0, padx=5, pady=5, columnspan=2, sticky="ns")
 
     def tabela(self):
         self.table_window = tk.Toplevel(self)
@@ -3062,102 +3047,60 @@ class KalkulatorWalut(tk.Toplevel):
         self.table["height"] = len(tabela_nbp)
 
     def kurs_walut(self, skrot):
-        link = f"http://api.nbp.pl/api/exchangerates/rates/a/{skrot}/"
-        response = requests.get(link)
-        link2 = f"http://api.nbp.pl/api/exchangerates/rates/b/{skrot}/"
-        response2 = requests.get(link2)
-
-        if response.status_code == 200:
-            try:
-                data = response.json()
-                mid_value = data["rates"][0]["mid"]
-                return mid_value
-            except json.decoder.JSONDecodeError:
-                info = f"Brak danych dla waluty o skrócie {skrot}"
-                return info
-        if response2.status_code == 200:
-            try:
-                data = response2.json()
-                mid_value = data["rates"][0]["mid"]
-                return mid_value
-            except json.decoder.JSONDecodeError:
-                info = f"Brak danych dla waluty o skrócie {skrot}"
-                return info
+        if skrot == "PLN":
+            return 1.00
         else:
-            info = "Wystąpił problem z połączeniem z Internetem!"
-            return info
+            link = f"http://api.nbp.pl/api/exchangerates/rates/a/{skrot}/"
+            response = requests.get(link)
+            link2 = f"http://api.nbp.pl/api/exchangerates/rates/b/{skrot}/"
+            response2 = requests.get(link2)
 
-    def konwertuj_do_pln(self):
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    mid_value = data["rates"][0]["mid"]
+                    return mid_value
+                except json.decoder.JSONDecodeError:
+                    info = f"Brak danych dla waluty o skrócie {skrot}"
+                    return info
+            if response2.status_code == 200:
+                try:
+                    data = response2.json()
+                    mid_value = data["rates"][0]["mid"]
+                    return mid_value
+                except json.decoder.JSONDecodeError:
+                    info = f"Brak danych dla waluty o skrócie {skrot}"
+                    return info
+            else:
+                info = "Wystąpił problem z połączeniem z Internetem!"
+                return info
+        
+    def konwertuj(self):
         try:
-            waluta = str(self.option_var.get())
-            skrot = tabela_nbp[waluta]
+            waluta1 = str(self.option_var1.get())
+            skrot1 = waluta1.split("[")[1].split("]")[0]
+            waluta2 = str(self.option_var2.get())
+            skrot2 = waluta2.split("[")[1].split("]")[0]
             ilosc = float(self.kwota.get())
-            link_1 = ("http://api.nbp.pl/api/exchangerates/rates/a/xyz/")
-            link_2 = ("http://api.nbp.pl/api/exchangerates/rates/b/xyz/")
-            response = requests.get(link_1.replace("xyz", "usd"))
-            if response.status_code == 200:
-                try:
-                    req = requests.get(link_1.replace("xyz", skrot.lower()))
-                    json_data = req.text
-                    data = json.loads(json_data)
-                except json.decoder.JSONDecodeError:
-                    req = requests.get(link_2.replace("xyz", skrot.lower()))
-                    json_data = req.text
-                    data = json.loads(json_data)
 
-                mid_value = data["rates"][0]["mid"]
-                kurs_z_dnia = data["rates"][0]["effectiveDate"]
+            kurs1 = self.kurs_walut(skrot1)
+            kurs2 = self.kurs_walut(skrot2)
 
-                calc = ilosc * mid_value
+            if isinstance(kurs1, float) and isinstance(kurs2, float):
+                calc = ilosc * kurs1 / kurs2
 
                 info = (
-                    f"{ilosc} {skrot} po kursie NBP z dnia {kurs_z_dnia} jest warte {round(calc,2)} PLN")
+                    f"{ilosc} {skrot1} jest warte {round(calc,2)} {skrot2}")
                 self.label1.config(text=info)
             else:
-                info = (f"Wystąpił problem z połączeniem z Internetem!")
-                self.label1.config(text=info)
-        except KeyError:
-            info = (f"Musisz wybrać walutę!")
-            self.label1.config(text=info)
+                self.label1.config(text="Nie można przeliczyć - błąd pobierania kursów walut!")
         except ValueError:
             info = (f"Wskaż kwotę do przeliczenia!")
             self.label1.config(text=info)
-
-    def konwertuj_z_pln(self):
-        try:
-            waluta = str(self.ooption_var.get())
-            skrot = tabela_nbp[waluta]
-            ilosc = float(self.okwota.get())
-            link_1 = ("http://api.nbp.pl/api/exchangerates/rates/a/xyz/")
-            link_2 = ("http://api.nbp.pl/api/exchangerates/rates/b/xyz/")
-            response = requests.get(link_1.replace("xyz", "usd"))
-            if response.status_code == 200:
-                try:
-                    req = requests.get(link_1.replace("xyz", skrot.lower()))
-                    json_data = req.text
-                    data = json.loads(json_data)
-                except json.decoder.JSONDecodeError:
-                    req = requests.get(link_2.replace("xyz", skrot.lower()))
-                    json_data = req.text
-                    data = json.loads(json_data)
-
-                mid_value = data["rates"][0]["mid"]
-                kurs_z_dnia = data["rates"][0]["effectiveDate"]
-
-                calc = ilosc / mid_value
-
-                info = (
-                    f"{ilosc} PLN po kursie NBP z dnia {kurs_z_dnia} jest warte {round(calc,2)} {skrot}")
-                self.olabel1.config(text=info)
-            else:
-                info = (f"Wystąpił problem z połączeniem z Internetem!")
-                self.olabel1.config(text=info)
-        except KeyError:
-            info = (f"Musisz wybrać walutę!")
-            self.olabel1.config(text=info)
-        except ValueError:
-            info = (f"Wskaż kwotę do przeliczenia!")
-            self.olabel1.config(text=info)
+        except IndexError:
+            info = (f"Wskaż waluty!")
+            self.label1.config(text=info)
+                
 
     def show_page(self, page):
         if self.current_page:
