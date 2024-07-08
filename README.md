@@ -1,7 +1,7 @@
 # b130n
 Kombajn do pracy biurowej
 
-b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z języka rosyjskiego, kalkulator walut, odczyt pogody ze stacji IMGW, generator kodów QR oraz tablice rejestracyjne.
+b130n to wszechstronna aplikacja desktopowa z prostym interfejsem graficznym, która oferuje kilka przydatnych narzędzi. Dzięki tej aplikacji można korzystać z różnych funkcji, takich jak kalkulator diet, generator haseł, generator numerów PESEL, transliteracja z obcych alfabetów, kalkulator walut, odczyt pogody ze stacji IMGW, generator kodów QR, tablice rejestracyjne, czytnik RSS, alkomat oraz konwerter temperatur.
 
 ## Funkcje
 
@@ -11,15 +11,15 @@ Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajo
 
 ### Generator Haseł
 
-Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby. Program jest w stanie pokazać ile czasu zajmie złamanie hasła metodą słownikową i brute force.
+Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby. Program jest w stanie pokazać ile czasu zajmie złamanie hasła metodą słownikową i brute force (obliczane na podstawie mocy obliczeniowej urządzenia, na którym uruchomiono program).
 
 ### Generator PESEL
 
-b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji lub potrzeb testowych. Ponadto możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu, adres e-mail oraz numer dowodu osobistego), także do pliku txt. W najnowszej wersji dodano obsługę błędów i poprawiono znalezione błędy.
+b130n oferuje generator numerów PESEL, który może być przydatny do testowania aplikacji. Możesz sprawdzić poprawność numeru PESEL, a nawet wygenerować fikcyjną tożsamość (imię, nazwisko, data urodzenia, PESEL, numer telefonu, adres e-mail oraz numer dowodu osobistego), także do pliku txt. W najnowszej wersji dodano obsługę błędów i poprawiono znalezione błędy.
 
-### Transliteracja z Rosyjskiego, Białoruskiego i Ukraińskiego
+### Transliteracja z Rosyjskiego, Białoruskiego, Ukraińskiego oraz Chińskiego
 
-Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, b130n ma gotowe narzędzie do transliteracji, które ułatwia ten proces. W najnowszej wersji dodano transliteracji z języka ukraińskiego i białoruskiego, a przy tym dodano klawiatury ekranowe dla każdego z języków.
+Jeśli potrzebujesz przekształcić tekst z alfabetu rosyjskiego na łaciński, b130n ma gotowe narzędzie do transliteracji, które ułatwia ten proces. W najnowszej wersji dodano transliterację z języka chińskiego. Dolstępne są klawiatury ekranowe dla każdego z języków (poza chińskim).
 
 ### Kalkulator Walut
 
@@ -36,6 +36,18 @@ Możesz odczytywać różne dane pogodowe z poszczególnych stacji prowadzonych 
 ### Tablice rejestracyjne
 
 Rozkodowywanie tablic rejestracyjnych w Polsce (policyjne, wojskowe, innych służb, dyplomatyczne, poszczególne powiaty). Dodano przyciski z tabelami pokazującymi jak zapisywane są numery rejestracyjne aut ałużbowych w Polsce.
+
+### Alkomat
+
+Moduł pozwala na podstawie płci, masy ciała, czasu spożycia alkoholu i jego ilości przedstawić stan upojenia wyrażony w promilach. Dane prezentowane są w tabeli pokazującej kiedy organizm zostanie w pełni oczyszczony z alkoholu.
+
+### Konwerter temperatut
+
+Proste narzędzie służące do konwertowania temperatur między skalami Celsjusza, Kelvina oraz Fahrenheita.
+
+### Czytnik RSS
+
+Prosty czytnik RSS korzystający z bazy Polsat NEWS.
 
 ## Technologie
 
