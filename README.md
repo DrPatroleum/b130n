@@ -11,7 +11,7 @@ Kalkulator diet pozwala użytkownikom obliczyć należną dietę, zarówno krajo
 
 ### Generator Haseł
 
-Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby. Program jest w stanie pokazać ile czasu zajmie złamanie hasła metodą słownikową i brute force (obliczane na podstawie mocy obliczeniowej urządzenia, na którym uruchomiono program).
+Generator pozwala tworzyć silne, losowe hasła, które są trudne do złamania. Możesz dostosować długość i skomplikowanie hasła, aby spełnić swoje potrzeby. Program jest w stanie pokazać siłę hasła na bazie jego entropii.
 
 ### Generator PESEL
 
