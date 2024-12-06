@@ -3603,44 +3603,53 @@ class GeneratorHasel(tk.Toplevel):
         for _ in range(self.pass_len.get()):
             self.password += ''.join(secrets.choice(charset))
 
-    def check_password_strength(self):
+    def calculate_entropy(self):
+        alfabet = 0
+        if any(c.islower() for c in self.password):
+            alfabet += 26 
+        if any(c.isupper() for c in self.password):
+            alfabet += 26
+        if any(c.isdigit() for c in self.password):
+            alfabet += 10
+        if any(c in "!@#$%^&*()-_=+{}[]|;:,.<>?/~`" for c in self.password):
+            alfabet += 32
+        
         dlugosc_hasla = len(self.password)
-        znaki = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+{}[]|;:,.<>?/~`"
-        liczba_znakow = len(znaki)
-        liczba_kombinacji_slownikowy = liczba_znakow ** dlugosc_hasla
-        liczba_kombinacji_brute_force = math.factorial(dlugosc_hasla) * (liczba_znakow ** dlugosc_hasla)
-        moc_komputera = psutil.cpu_count() * psutil.cpu_freq().max
-        szybkosc_ataku = moc_komputera * 1000000
-        czas_zlamania_slownik = liczba_kombinacji_slownikowy / szybkosc_ataku
-        czas_zlamania_brute = liczba_kombinacji_brute_force / szybkosc_ataku
+        if alfabet == 0 or dlugosc_hasla == 0:
+            return 0
 
-        jednostki_czasu = [("lat", 60 * 60 * 24 * 365), ("dni", 60 * 60 * 24), ("godzin", 60 * 60), ("minut", 60), ("sekundy", 1)]
+        entropia = dlugosc_hasla * math.log2(alfabet)
+        return entropia
 
-        for jednostka, wartosc_w_sekundach in jednostki_czasu:
-            if czas_zlamania_brute >= wartosc_w_sekundach:
-                czas_brute_jednostka = czas_zlamania_brute / wartosc_w_sekundach
-                czas_zlamania_brute %= wartosc_w_sekundach
-                czas_zlamania_brute = int(czas_zlamania_brute)
-                break
+    def evaluate_password_strength(self):
+        entropia = self.calculate_entropy()
 
-        for jednostka, wartosc_w_sekundach in jednostki_czasu:
-            if czas_zlamania_slownik >= wartosc_w_sekundach:
-                czas_slownik_jednostka = czas_zlamania_slownik / wartosc_w_sekundach
-                czas_zlamania_slownik %= wartosc_w_sekundach
-                czas_zlamania_slownik = int(czas_zlamania_slownik)
-                break
+        if entropia < 28:
+            ocena = "BARDZO SŁABE"
+            komentarz = "(możliwe do złamania w kilka sekund)"
+        elif 28 <= entropia <= 35:
+            ocena = "SŁABE"
+            komentarz = "(możliwe do złamania w godziny/dni)"
+        elif 36 <= entropia <= 59:
+            ocena = "ŚREDNIE"
+            komentarz = "(możliwe do złamania w tygodnie/miesiące)"
+        else:
+            ocena = "SILNE"
+            komentarz = "(zajmuje lata lub dekady do złamania)"
 
-        self.power = (f"""Hasło można złamać:
-            metodą brute force w czasie {math.floor(czas_brute_jednostka)} {jednostka}
-            metodą słownikową w czasie {math.floor(czas_slownik_jednostka)} {jednostka}""")
-        return self.power
+        werdykt = (f"""
+                   Entropia: {entropia:.2f} bitów\n
+                   Siła hasła: {ocena}\n
+                   {komentarz}
+                   """)
+        return werdykt
 
     def check_passwd_power(self):
-        self.check_password_strength()
+        
         self.msgbox = (f"""
             Wygenerowane hasło to:\n
             {str(self.password)}\n
-            {self.power}\n
+            {self.evaluate_password_strength()}\n
             Hasło zostało skopiowane do schowka!
                 """)
         messagebox.showinfo('Śliwka Coding Center ©', self.msgbox)
