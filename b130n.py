@@ -2463,6 +2463,8 @@ class DietyZagraniczne(tk.Toplevel):
             liczba_minut = tmins - (liczba_godzin*60) - (liczba_dni*24*60)
             nalezna_dieta_dzien = liczba_dni*dieta
 
+        liczba_dni_naleznosc = liczba_dni
+        
         if liczba_godzin == 0:
             nalezna_dieta_godz = 0
             wysokosc_stawki = "0"
@@ -2473,8 +2475,10 @@ class DietyZagraniczne(tk.Toplevel):
             nalezna_dieta_godz = dieta * 0.5
             wysokosc_stawki = "1/2"
         if liczba_godzin >= 12:
-            nalezna_dieta_godz = dieta
-            wysokosc_stawki = "0"
+            nalezna_dieta_dzien = nalezna_dieta_dzien + dieta
+            liczba_dni_naleznosc +=1
+            nalezna_dieta_godz = 0
+            wysokosc_stawki = "-"
 
         try:
             sniadanie = int(self.zilosc_sniadanie.get()) * (dieta * 0.15)
@@ -2596,7 +2600,7 @@ class DietyZagraniczne(tk.Toplevel):
                 Finalnie należy się {round(nalezna_dieta,2)} {omega}.\n
                 ***N A L E Ż N O Ś Ć***\n
                 Przysługuje Ci {round(naleznosc,2)} {omega} należności.
-                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
+                - diety w pełnej wysokości stawki [{liczba_dni_naleznosc} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
                 - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {round(nalezna_dieta_godz,2)} {omega}]
                 - razem [{round(diet,2)} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
@@ -2611,7 +2615,7 @@ class DietyZagraniczne(tk.Toplevel):
                 Finalnie należy się {round(nalezna_dieta,2)} {omega}.\n
                 ***N A L E Ż N O Ś Ć***\n
                 Przysługuje Ci {round(naleznosc,2)} {omega} należności.
-                - diety w pełnej wysokości stawki [{liczba_dni} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
+                - diety w pełnej wysokości stawki [{liczba_dni_naleznosc} x {dieta} {omega} = {round(nalezna_dieta_dzien,2)} {omega}]
                 - diety w wysokości {wysokosc_stawki} stawki [{wysokosc_stawki} x {dieta} {omega} = {round(nalezna_dieta_godz,2)} {omega}]
                 - razem [{round(diet,2)} x {(self.wybor_naleznosc.get())} = {round(naleznosc,2)} {omega}]
                 """)
